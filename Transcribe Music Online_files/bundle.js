@@ -16883,7 +16883,7 @@
             }, l.default.createElement("button", {
               onClick: this.props.onPlay,
               className: "btn btn-default",
-              title: "Hotkey: r"
+              title: "Hotkey: space"
             }, "Play"), l.default.createElement("button", {
               onClick: this.props.onPause,
               className: "btn btn-default",
@@ -16957,8 +16957,8 @@
             }, l.default.createElement("button", {
               onClick: this.props.onJumpToStart,
               className: "btn btn-default btn-sm",
-              title: "Jump to the start of the song"
-            }, "Start"), l.default.createElement("button", {
+              title: "Jump to the start of the file"
+            }, "File Start"), l.default.createElement("button", {
               onClick: this.props.onJumpToSelectionStart,
               className: "btn btn-default btn-sm",
               disabled: null == this.props.selectionEnd,
@@ -21054,11 +21054,22 @@
             }
           }
         }, {
+          key: "seekToSeconds",
+          value: function(e3) {
+            if (!this.player.loaded) {
+              return;
+            }
+            var t2 = this.player.audioBuffer.duration;
+            var n = Math.max(0, Math.min(e3, t2));
+            this.player.seek(n);
+            this.props.dispatch(we.setPlaybackTime(n));
+            this.repositionScroll();
+            this.forceUpdate();
+          }
+        }, {
           key: "seekToPlaybackTime",
           value: function(e3) {
-            var t2 = this.player.audioBuffer.duration * e3;
-            this.player.seek(t2);
-            this.props.dispatch(we.setPlaybackTime(t2));
+            this.seekToSeconds(this.player.audioBuffer.duration * e3);
           }
         }, {
           key: "setupHotkeys",
@@ -21067,13 +21078,15 @@
             if (typeof g.key != "undefined") {
               var t2 = this.props.dispatch;
               (0, g.key)("space", function() {
-                return e3.player.playPause();
+                e3.player.playPause();
+                return false;
               });
               (0, g.key)("r", function() {
                 return e3.player.play(true, true);
               });
               (0, g.key)("p", function() {
-                return e3.player.playPause();
+                e3.player.playPause();
+                return false;
               });
               (0, g.key)("m", function() {
                 return t2(be.addMark());
@@ -21416,13 +21429,13 @@
               isPlaying: this.props.playback.isPlaying
             })), h.default.createElement(X.default, {
               onPlay: function() {
-                return e3.player.play(true, true);
+                return e3.player.playPause();
               },
               onPause: function() {
                 return e3.player.playPause();
               },
               onJumpToStart: function() {
-                return e3.seekToPlaybackTime(0);
+                return e3.seekToSeconds(0);
               },
               onJumpToSelectionStart: function() {
                 return null != e3.props.loops.currentLoop.end ? e3.seekToPlaybackTime(e3.props.loops.currentLoop.start) : null;

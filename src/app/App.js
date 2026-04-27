@@ -323,11 +323,22 @@ var Me = function (e) {
       }
     }
   }, {
+    key: "seekToSeconds",
+    value: function (e) {
+      if (!this.player.loaded) {
+        return;
+      }
+      var t = this.player.audioBuffer.duration;
+      var n = Math.max(0, Math.min(e, t));
+      this.player.seek(n);
+      this.props.dispatch(we.setPlaybackTime(n));
+      this.repositionScroll();
+      this.forceUpdate();
+    }
+  }, {
     key: "seekToPlaybackTime",
     value: function (e) {
-      var t = this.player.audioBuffer.duration * e;
-      this.player.seek(t);
-      this.props.dispatch(we.setPlaybackTime(t));
+      this.seekToSeconds(this.player.audioBuffer.duration * e);
     }
   }, {
     key: "setupHotkeys",
@@ -336,13 +347,15 @@ var Me = function (e) {
       if (typeof g.key != "undefined") {
         var t = this.props.dispatch;
         (0, g.key)("space", function () {
-          return e.player.playPause();
+          e.player.playPause();
+          return false;
         });
         (0, g.key)("r", function () {
           return e.player.play(true, true);
         });
         (0, g.key)("p", function () {
-          return e.player.playPause();
+          e.player.playPause();
+          return false;
         });
         (0, g.key)("m", function () {
           return t(be.addMark());
@@ -684,13 +697,13 @@ var Me = function (e) {
         isPlaying: this.props.playback.isPlaying
       })), h.default.createElement(X.default, {
         onPlay: function () {
-          return e.player.play(true, true);
+          return e.player.playPause();
         },
         onPause: function () {
           return e.player.playPause();
         },
         onJumpToStart: function () {
-          return e.seekToPlaybackTime(0);
+          return e.seekToSeconds(0);
         },
         onJumpToSelectionStart: function () {
           return null != e.props.loops.currentLoop.end ? e.seekToPlaybackTime(e.props.loops.currentLoop.start) : null;

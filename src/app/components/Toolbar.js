@@ -128,7 +128,7 @@ var c = function (e) {
       }, l.default.createElement("button", {
         onClick: this.props.onPlay,
         className: "btn btn-default",
-        title: "Hotkey: r"
+        title: "Hotkey: space"
       }, "Play"), l.default.createElement("button", {
         onClick: this.props.onPause,
         className: "btn btn-default",
@@ -202,8 +202,8 @@ var c = function (e) {
       }, l.default.createElement("button", {
         onClick: this.props.onJumpToStart,
         className: "btn btn-default btn-sm",
-        title: "Jump to the start of the song"
-      }, "Start"), l.default.createElement("button", {
+        title: "Jump to the start of the file"
+      }, "File Start"), l.default.createElement("button", {
         onClick: this.props.onJumpToSelectionStart,
         className: "btn btn-default btn-sm",
         disabled: null == this.props.selectionEnd,
