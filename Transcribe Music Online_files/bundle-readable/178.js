@@ -1,1 +1,0 @@
-module.exports = require.p + "soundtouch.js";
