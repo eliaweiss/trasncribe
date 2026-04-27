@@ -28,29 +28,46 @@ function ratioFromEvent(event, canvas) {
 
 export default function SelectionOverlay({ height, onSeek, selection, selectionMode, setSelection, width }) {
   const canvasRef = useRef(null);
-  const [dragStart, setDragStart] = useState(null);
+  const dragStartRef = useRef(null);
+  const [isDragging, setIsDragging] = useState(false);
 
   useEffect(() => {
     if (canvasRef.current) drawSelection(canvasRef.current, selection);
   }, [selection, width]);
 
+  const updateSectionEnd = event => {
+    if (dragStartRef.current == null) return;
+    const current = ratioFromEvent(event, canvasRef.current);
+    setSelection({ start: Math.min(dragStartRef.current, current), end: Math.max(dragStartRef.current, current) });
+  };
+
   const beginSelection = event => {
+    event.preventDefault();
+    canvasRef.current.setPointerCapture?.(event.pointerId);
     const start = ratioFromEvent(event, canvasRef.current);
-    setDragStart(selectionMode === "section" ? start : null);
     onSeek(start);
     setSelection({ start, end: null });
+
+    if (selectionMode === "section") {
+      dragStartRef.current = start;
+      setIsDragging(true);
+    } else {
+      dragStartRef.current = null;
+      setIsDragging(false);
+    }
   };
 
   const updateSelection = event => {
-    if (dragStart == null) return;
-    const current = ratioFromEvent(event, canvasRef.current);
-    setSelection({ start: Math.min(dragStart, current), end: Math.max(dragStart, current) });
+    if (!isDragging) return;
+    updateSectionEnd(event);
   };
 
   const endSelection = event => {
-    if (dragStart == null) return;
-    updateSelection(event);
-    setDragStart(null);
+    if (!isDragging) return;
+    updateSectionEnd(event);
+    dragStartRef.current = null;
+    setIsDragging(false);
+    canvasRef.current.releasePointerCapture?.(event.pointerId);
   };
 
   return (
@@ -59,10 +76,20 @@ export default function SelectionOverlay({ height, onSeek, selection, selectionM
       width={width}
       height={height}
       id="waveform-selection"
-      onMouseDown={beginSelection}
-      onMouseMove={updateSelection}
-      onMouseUp={endSelection}
-      style={{ MozUserSelect: "none", userSelect: "none" }}
+      onPointerDown={beginSelection}
+      onPointerMove={updateSelection}
+      onPointerUp={endSelection}
+      style={{
+        cursor: selectionMode === "section" ? "crosshair" : "pointer",
+        left: 0,
+        MozUserSelect: "none",
+        pointerEvents: "auto",
+        position: "absolute",
+        top: 0,
+        touchAction: "none",
+        userSelect: "none",
+        zIndex: 50,
+      }}
       unselectable="on"
     />
   );
