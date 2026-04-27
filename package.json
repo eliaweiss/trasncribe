@@ -1,0 +1,10 @@
+{
+  "scripts": {
+    "build": "esbuild src/index.js --bundle --format=iife --outfile=\"Transcribe Music Online_files/bundle.js\"",
+    "check": "node --check \"Transcribe Music Online_files/bundle.js\""
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.0",
+    "webcrack": "^2.16.0"
+  }
+}

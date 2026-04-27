@@ -1,0 +1,10 @@
+function n(e) {
+  var t = {};
+  return function (n) {
+    if (!t.hasOwnProperty(n)) {
+      t[n] = e.call(this, n);
+    }
+    return t[n];
+  };
+}
+module.exports = n;
