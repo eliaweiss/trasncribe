@@ -706,7 +706,7 @@ var Me = function (e) {
           return e.seekToSeconds(0);
         },
         onJumpToSelectionStart: function () {
-          return null != e.props.loops.currentLoop.end ? e.seekToPlaybackTime(e.props.loops.currentLoop.start) : null;
+          return null != e.props.loops.currentLoop.start ? e.seekToPlaybackTime(e.props.loops.currentLoop.start) : null;
         },
         onJumpToSelectionEnd: function () {
           return null != e.props.loops.currentLoop.end ? e.seekToPlaybackTime(e.props.loops.currentLoop.end) : null;

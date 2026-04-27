@@ -16961,7 +16961,7 @@
             }, "File Start"), l.default.createElement("button", {
               onClick: this.props.onJumpToSelectionStart,
               className: "btn btn-default btn-sm",
-              disabled: null == this.props.selectionEnd,
+              disabled: null == this.props.selectionStart,
               title: "Jump to the start of the selected loop"
             }, "Selection Start"), l.default.createElement("button", {
               onClick: this.props.onJumpToSelectionEnd,
@@ -21438,7 +21438,7 @@
                 return e3.seekToSeconds(0);
               },
               onJumpToSelectionStart: function() {
-                return null != e3.props.loops.currentLoop.end ? e3.seekToPlaybackTime(e3.props.loops.currentLoop.start) : null;
+                return null != e3.props.loops.currentLoop.start ? e3.seekToPlaybackTime(e3.props.loops.currentLoop.start) : null;
               },
               onJumpToSelectionEnd: function() {
                 return null != e3.props.loops.currentLoop.end ? e3.seekToPlaybackTime(e3.props.loops.currentLoop.end) : null;

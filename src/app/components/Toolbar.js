@@ -206,7 +206,7 @@ var c = function (e) {
       }, "File Start"), l.default.createElement("button", {
         onClick: this.props.onJumpToSelectionStart,
         className: "btn btn-default btn-sm",
-        disabled: null == this.props.selectionEnd,
+        disabled: null == this.props.selectionStart,
         title: "Jump to the start of the selected loop"
       }, "Selection Start"), l.default.createElement("button", {
         onClick: this.props.onJumpToSelectionEnd,
