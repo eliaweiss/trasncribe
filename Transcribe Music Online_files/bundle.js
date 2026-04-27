@@ -16948,7 +16948,27 @@
               onClick: function(t3) {
                 return e3.setDelay(t3, null);
               }
-            }, "None"))))))), t2);
+            }, "None"))))))), l.default.createElement("div", {
+              className: "btn-group pull-left",
+              style: {
+                clear: "left",
+                marginTop: ".25em"
+              }
+            }, l.default.createElement("button", {
+              onClick: this.props.onJumpToStart,
+              className: "btn btn-default btn-sm",
+              title: "Jump to the start of the song"
+            }, "Start"), l.default.createElement("button", {
+              onClick: this.props.onJumpToSelectionStart,
+              className: "btn btn-default btn-sm",
+              disabled: null == this.props.selectionEnd,
+              title: "Jump to the start of the selected loop"
+            }, "Selection Start"), l.default.createElement("button", {
+              onClick: this.props.onJumpToSelectionEnd,
+              className: "btn btn-default btn-sm",
+              disabled: null == this.props.selectionEnd,
+              title: "Jump to the end of the selected loop"
+            }, "Selection End")), t2);
           }
         }]);
         return t;
@@ -21401,6 +21421,17 @@
               onPause: function() {
                 return e3.player.playPause();
               },
+              onJumpToStart: function() {
+                return e3.seekToPlaybackTime(0);
+              },
+              onJumpToSelectionStart: function() {
+                return null != e3.props.loops.currentLoop.end ? e3.seekToPlaybackTime(e3.props.loops.currentLoop.start) : null;
+              },
+              onJumpToSelectionEnd: function() {
+                return null != e3.props.loops.currentLoop.end ? e3.seekToPlaybackTime(e3.props.loops.currentLoop.end) : null;
+              },
+              selectionStart: this.props.loops.currentLoop.start,
+              selectionEnd: this.props.loops.currentLoop.end,
               onAdjustModeChange: function(t3) {
                 return e3.setState({
                   adjustMode: t3
@@ -23041,7 +23072,7 @@
       var i = require__254();
       var s = r(i);
       var u = require_AppProvider();
-      r(u);
+      var appProvider = r(u);
       var l = require__222();
       var c = r(l);
       var p = require__255();
@@ -23050,9 +23081,13 @@
       var h = r(f);
       require__256();
       if (typeof window != "undefined") {
-        c.default.setAppElement(document.body);
-        h.default.render(a.default.createElement(s.default, null), document);
+        root = document.createElement("div");
+        document.body.innerHTML = "";
+        document.body.appendChild(root);
+        c.default.setAppElement(root);
+        h.default.render(a.default.createElement(appProvider.default, null), root);
       }
+      var root;
       exports.default = function(e2, t) {
         var n = d.default.renderToString(a.default.createElement(s.default, e2));
         t(null, "<!DOCTYPE html>" + n);

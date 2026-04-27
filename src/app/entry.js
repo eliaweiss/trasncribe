@@ -15,7 +15,7 @@ var a = r(o);
 var i = require("../generated/146.js");
 var s = r(i);
 var u = require("./AppProvider.js");
-r(u);
+var appProvider = r(u);
 var l = require("../generated/19.js");
 var c = r(l);
 var p = require("../generated/204.js");
@@ -24,8 +24,11 @@ var f = require("../generated/33.js");
 var h = r(f);
 require("../generated/278.js");
 if (typeof window != "undefined") {
-  c.default.setAppElement(document.body);
-  h.default.render(a.default.createElement(s.default, null), document);
+  var root = document.createElement("div");
+  document.body.innerHTML = "";
+  document.body.appendChild(root);
+  c.default.setAppElement(root);
+  h.default.render(a.default.createElement(appProvider.default, null), root);
 }
 exports.default = function (e, t) {
   var n = d.default.renderToString(a.default.createElement(s.default, e));

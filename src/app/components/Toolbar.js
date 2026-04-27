@@ -193,7 +193,27 @@ var c = function (e) {
         onClick: function (t) {
           return e.setDelay(t, null);
         }
-      }, "None"))))))), t);
+      }, "None"))))))), l.default.createElement("div", {
+        className: "btn-group pull-left",
+        style: {
+          clear: "left",
+          marginTop: ".25em"
+        }
+      }, l.default.createElement("button", {
+        onClick: this.props.onJumpToStart,
+        className: "btn btn-default btn-sm",
+        title: "Jump to the start of the song"
+      }, "Start"), l.default.createElement("button", {
+        onClick: this.props.onJumpToSelectionStart,
+        className: "btn btn-default btn-sm",
+        disabled: null == this.props.selectionEnd,
+        title: "Jump to the start of the selected loop"
+      }, "Selection Start"), l.default.createElement("button", {
+        onClick: this.props.onJumpToSelectionEnd,
+        className: "btn btn-default btn-sm",
+        disabled: null == this.props.selectionEnd,
+        title: "Jump to the end of the selected loop"
+      }, "Selection End")), t);
     }
   }]);
   return t;

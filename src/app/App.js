@@ -689,6 +689,17 @@ var Me = function (e) {
         onPause: function () {
           return e.player.playPause();
         },
+        onJumpToStart: function () {
+          return e.seekToPlaybackTime(0);
+        },
+        onJumpToSelectionStart: function () {
+          return null != e.props.loops.currentLoop.end ? e.seekToPlaybackTime(e.props.loops.currentLoop.start) : null;
+        },
+        onJumpToSelectionEnd: function () {
+          return null != e.props.loops.currentLoop.end ? e.seekToPlaybackTime(e.props.loops.currentLoop.end) : null;
+        },
+        selectionStart: this.props.loops.currentLoop.start,
+        selectionEnd: this.props.loops.currentLoop.end,
         onAdjustModeChange: function (t) {
           return e.setState({
             adjustMode: t
