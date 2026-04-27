@@ -112,6 +112,17 @@ export default function App() {
     jumpToRatio(selection.end);
   }, [jumpToRatio, selection.end]);
 
+  useEffect(() => {
+    if (!player.duration || selection.end == null) {
+      player.setLoopRange(null);
+      return;
+    }
+
+    const start = selection.start * player.duration;
+    const end = selection.end * player.duration;
+    player.setLoopRange(end > start ? { start, end } : null);
+  }, [player, selection.end, selection.start]);
+
   const sortedMarks = useMemo(() => marks.slice().sort((a, b) => a.position - b.position), [marks]);
 
   return (

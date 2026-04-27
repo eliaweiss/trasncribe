@@ -13109,6 +13109,7 @@
   var import_react12 = __toESM(require_react());
   function useAudioPlayer() {
     const audioRef = (0, import_react12.useRef)(new Audio());
+    const loopRangeRef = (0, import_react12.useRef)(null);
     const youtubePlayerRef = (0, import_react12.useRef)(null);
     const [sourceUrl, setSourceUrl] = (0, import_react12.useState)(null);
     const [sourceType, setSourceType] = (0, import_react12.useState)(null);
@@ -13119,8 +13120,16 @@
     const [tempo, setTempoState] = (0, import_react12.useState)(100);
     const syncTime = (0, import_react12.useCallback)(() => {
       const audio = audioRef.current;
+      const audioDuration = audio.duration || 0;
+      const loopRange = loopRangeRef.current;
+      if (loopRange && !audio.paused && audio.currentTime >= loopRange.end) {
+        audio.currentTime = loopRange.start;
+        setCurrentTime(loopRange.start);
+        setDuration(audioDuration);
+        return;
+      }
       setCurrentTime(audio.currentTime || 0);
-      setDuration(audio.duration || 0);
+      setDuration(audioDuration);
     }, []);
     (0, import_react12.useEffect)(() => {
       const audio = audioRef.current;
@@ -13142,6 +13151,9 @@
       audioRef.current.playbackRate = clampedTempo / 100;
       youtubePlayerRef.current?.setPlaybackRate?.(clampedTempo / 100);
     }, []);
+    const setLoopRange = (0, import_react12.useCallback)((range) => {
+      loopRangeRef.current = range;
+    }, []);
     const load = (0, import_react12.useCallback)((url) => {
       const audio = audioRef.current;
       if (sourceUrl) URL.revokeObjectURL(sourceUrl);
@@ -13154,6 +13166,7 @@
       setSourceUrl(url);
       setSourceType("audio");
       setYoutubeVideoId("");
+      loopRangeRef.current = null;
       setCurrentTime(0);
       setDuration(0);
       setIsPlaying(false);
@@ -13167,6 +13180,7 @@
       setSourceUrl(`youtube:${videoId}`);
       setSourceType("youtube");
       setYoutubeVideoId(videoId);
+      loopRangeRef.current = null;
       setCurrentTime(0);
       setDuration(0);
       setIsPlaying(false);
@@ -13249,8 +13263,18 @@
         const player = youtubePlayerRef.current;
         if (!player) return;
         const state = player.getPlayerState?.();
-        setCurrentTime(player.getCurrentTime?.() || 0);
-        setDuration(player.getDuration?.() || 0);
+        const nextDuration = player.getDuration?.() || 0;
+        const nextTime = player.getCurrentTime?.() || 0;
+        const loopRange = loopRangeRef.current;
+        if (loopRange && state === window.YT?.PlayerState?.PLAYING && nextTime >= loopRange.end) {
+          player.seekTo(loopRange.start, true);
+          setCurrentTime(loopRange.start);
+          setDuration(nextDuration);
+          setIsPlaying(true);
+          return;
+        }
+        setCurrentTime(nextTime);
+        setDuration(nextDuration);
         setIsPlaying(state === window.YT?.PlayerState?.PLAYING);
       }, 250);
       return () => window.clearInterval(timer);
@@ -13282,6 +13306,7 @@
       playFromStart,
       playPause,
       seek,
+      setLoopRange,
       setTempo,
       sourceUrl,
       sourceType,
@@ -13379,6 +13404,15 @@
       if (selection.end == null) return;
       jumpToRatio(selection.end);
     }, [jumpToRatio, selection.end]);
+    (0, import_react13.useEffect)(() => {
+      if (!player.duration || selection.end == null) {
+        player.setLoopRange(null);
+        return;
+      }
+      const start = selection.start * player.duration;
+      const end = selection.end * player.duration;
+      player.setLoopRange(end > start ? { start, end } : null);
+    }, [player, selection.end, selection.start]);
     const sortedMarks = (0, import_react13.useMemo)(() => marks.slice().sort((a, b) => a.position - b.position), [marks]);
     return /* @__PURE__ */ import_react13.default.createElement("div", { className: `page-wrap ${isLoaded ? "audio-loaded" : "audio-not-loaded"}` }, /* @__PURE__ */ import_react13.default.createElement(Header, { onChooseAudio: chooseAudio, onChooseYouTube: chooseYouTube }), /* @__PURE__ */ import_react13.default.createElement("input", { ref: fileInputRef, type: "file", className: "hidden", accept: "audio/*", onChange: onFileInput }), !isLoaded && /* @__PURE__ */ import_react13.default.createElement(Landing, { onChooseAudio: chooseAudio, onLoadYouTube: loadYouTube }), isLoaded && /* @__PURE__ */ import_react13.default.createElement(import_react13.default.Fragment, null, /* @__PURE__ */ import_react13.default.createElement(
       Player,

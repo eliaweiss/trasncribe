@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 export function useAudioPlayer() {
   const audioRef = useRef(new Audio());
+  const loopRangeRef = useRef(null);
   const youtubePlayerRef = useRef(null);
   const [sourceUrl, setSourceUrl] = useState(null);
   const [sourceType, setSourceType] = useState(null);
@@ -13,8 +14,18 @@ export function useAudioPlayer() {
 
   const syncTime = useCallback(() => {
     const audio = audioRef.current;
+    const audioDuration = audio.duration || 0;
+    const loopRange = loopRangeRef.current;
+
+    if (loopRange && !audio.paused && audio.currentTime >= loopRange.end) {
+      audio.currentTime = loopRange.start;
+      setCurrentTime(loopRange.start);
+      setDuration(audioDuration);
+      return;
+    }
+
     setCurrentTime(audio.currentTime || 0);
-    setDuration(audio.duration || 0);
+    setDuration(audioDuration);
   }, []);
 
   useEffect(() => {
@@ -39,6 +50,10 @@ export function useAudioPlayer() {
     youtubePlayerRef.current?.setPlaybackRate?.(clampedTempo / 100);
   }, []);
 
+  const setLoopRange = useCallback(range => {
+    loopRangeRef.current = range;
+  }, []);
+
   const load = useCallback(url => {
     const audio = audioRef.current;
     if (sourceUrl) URL.revokeObjectURL(sourceUrl);
@@ -51,6 +66,7 @@ export function useAudioPlayer() {
     setSourceUrl(url);
     setSourceType("audio");
     setYoutubeVideoId("");
+    loopRangeRef.current = null;
     setCurrentTime(0);
     setDuration(0);
     setIsPlaying(false);
@@ -65,6 +81,7 @@ export function useAudioPlayer() {
     setSourceUrl(`youtube:${videoId}`);
     setSourceType("youtube");
     setYoutubeVideoId(videoId);
+    loopRangeRef.current = null;
     setCurrentTime(0);
     setDuration(0);
     setIsPlaying(false);
@@ -158,8 +175,20 @@ export function useAudioPlayer() {
       const player = youtubePlayerRef.current;
       if (!player) return;
       const state = player.getPlayerState?.();
-      setCurrentTime(player.getCurrentTime?.() || 0);
-      setDuration(player.getDuration?.() || 0);
+      const nextDuration = player.getDuration?.() || 0;
+      const nextTime = player.getCurrentTime?.() || 0;
+      const loopRange = loopRangeRef.current;
+
+      if (loopRange && state === window.YT?.PlayerState?.PLAYING && nextTime >= loopRange.end) {
+        player.seekTo(loopRange.start, true);
+        setCurrentTime(loopRange.start);
+        setDuration(nextDuration);
+        setIsPlaying(true);
+        return;
+      }
+
+      setCurrentTime(nextTime);
+      setDuration(nextDuration);
       setIsPlaying(state === window.YT?.PlayerState?.PLAYING);
     }, 250);
 
@@ -196,6 +225,7 @@ export function useAudioPlayer() {
     playFromStart,
     playPause,
     seek,
+    setLoopRange,
     setTempo,
     sourceUrl,
     sourceType,
