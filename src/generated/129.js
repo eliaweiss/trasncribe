@@ -8,25 +8,10 @@ function r(e) {
   }
 }
 function o(e) {
-  var t = e.isLoggedIn ? i.default.createElement("a", {
-    href: "#",
-    onClick: function (t) {
-      t.preventDefault();
-      e.onLogout();
-    }
-  }, "Log out") : i.default.createElement("a", {
-    href: "#",
-    onClick: function (t) {
-      t.preventDefault();
-      e.onLogin();
-    }
-  }, "Log in");
   return i.default.createElement("nav", {
     className: "navbar navbar-default",
     role: "navigation"
-  }, i.default.createElement("script", {
-    src: "https://cdn.auth0.com/js/lock/11.0.1/lock.min.js"
-  }), i.default.createElement("div", {
+  }, i.default.createElement("div", {
     className: "navbar-header"
   }, i.default.createElement("button", {
     type: "button",
@@ -64,7 +49,7 @@ function o(e) {
       t.preventDefault();
       e.onHelp();
     }
-  }, "Help")), i.default.createElement("li", null, t))));
+  }, "Help"))));
 }
 Object.defineProperty(exports, "__esModule", {
   value: true

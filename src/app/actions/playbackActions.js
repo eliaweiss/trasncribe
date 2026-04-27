@@ -1,16 +1,10 @@
 function r(e) {
   return function (t, n) {
-    if (!["gold", "silver"].includes(n().auth.plan) && e < 50) {
-      t(r(50));
-      t((0, p.gatherRegistration)("Slow down to 25% and more!"));
-      return;
-    } else {
-      t({
-        type: "setTempo",
-        tempo: e
-      });
-      return;
-    }
+    t({
+      type: "setTempo",
+      tempo: e
+    });
+    return;
   };
 }
 function o(e) {
@@ -40,31 +34,21 @@ function s(e) {
 }
 function u(e, t) {
   return function (n, r) {
-    if (["gold"].includes(r().auth.plan)) {
-      n({
-        type: "changePitch",
-        amount: e,
-        value: t
-      });
-      return;
-    } else {
-      n((0, p.gatherRegistration)("Change pitch and more!"));
-      return;
-    }
+    n({
+      type: "changePitch",
+      amount: e,
+      value: t
+    });
+    return;
   };
 }
 function l(e) {
   return function (t, n) {
-    if (["gold", "silver"].includes(n().auth.plan)) {
-      t({
-        type: "setDelay",
-        seconds: e
-      });
-      return;
-    } else {
-      t((0, p.gatherRegistration)("Delay start and more!"));
-      return;
-    }
+    t({
+      type: "setDelay",
+      seconds: e
+    });
+    return;
   };
 }
 function c(e) {
@@ -84,4 +68,3 @@ exports.setVolume = s;
 exports.changePitch = u;
 exports.setDelay = l;
 exports.changePlayStatus = c;
-var p = require("../../generated/22.js");

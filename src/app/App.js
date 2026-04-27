@@ -180,8 +180,6 @@ var A = require("../generated/123.js");
 var I = o(A);
 var j = require("../generated/130.js");
 var L = o(j);
-var U = require("../generated/134.js");
-var F = o(U);
 var B = require("../generated/125.js");
 var V = o(B);
 var W = require("./components/MarkPanel.js");
@@ -220,12 +218,6 @@ var Ee = require("./actions/playbackActions.js");
 var we = r(Ee);
 var Ce = require("./actions/zoomActions.js");
 var _e = r(Ce);
-var Oe = require("../generated/66.js");
-var Pe = r(Oe);
-var ke = require("../generated/22.js");
-var Se = r(ke);
-var xe = require("../generated/30.js");
-var Te = o(xe);
 var Me = function (e) {
   function t(e) {
     var n = this;
@@ -240,9 +232,6 @@ var Me = function (e) {
     };
     this.player.onAudioBufferChanged = function () {
       r(me.audioLoaded(n.player.getDataHash()));
-      if (n.props.auth.isLoggedIn) {
-        r(Pe.loadWorkspace(n.props.audio.dataHash));
-      }
     };
     this.player.onStatusChanged = function (e) {
       r(we.changePlayStatus(e));
@@ -253,17 +242,6 @@ var Me = function (e) {
         }, 1000);
       }
     };
-    if (typeof window != "undefined") {
-      window.addEventListener("storage", function (e) {
-        var t = (0, Te.default)().getToken();
-        var n = t.token;
-        var o = t.plan;
-        if (n) {
-          r(Se.completeLogin(null, n, o));
-          r(Pe.loadWorkspace(this.props.audio.dataHash));
-        }
-      }, false);
-    }
   }
   i(t, e);
   p(t, [{
@@ -282,12 +260,6 @@ var Me = function (e) {
       var o = typeof document != "undefined" ? document.body.offsetWidth : 0;
       this.setState({
         width: o
-      });
-      (0, Te.default)().getAuthStatus().then(function (t) {
-        if (t.plan) {
-          var n = e.props.dispatch;
-          n(Se.completeLogin(null, t.token, t.plan));
-        }
       });
     }
   }, {
@@ -310,11 +282,6 @@ var Me = function (e) {
       }
       if (this.props.zoom.level !== e.zoom.level) {
         this.repositionScroll();
-      }
-      if (this.props.auth.isGatheringCredentials && !e.auth.isGatheringCredentials) {
-        var a = this.props.dispatch;
-        a(Se.beginLogin());
-        (0, Te.default)().login();
       }
       this.player.delay = this.props.playback.delay;
       this.player.speed = this.props.playback.tempo;
@@ -500,19 +467,15 @@ var Me = function (e) {
   }, {
     key: "showRegister",
     value: function (e) {
-      this.props.dispatch(Se.gatherRegistration(e));
+      return null;
     }
   }, {
     key: "downloadLoopOrDisplay",
     value: function () {
-      if (["gold", "silver"].includes(this.props.auth.plan)) {
-        this.setState({
-          isSavingLoop: true
-        });
-        return;
-      } else {
-        return this.showRegister("Save to MP3 and more!");
-      }
+      this.setState({
+        isSavingLoop: true
+      });
+      return;
     }
   }, {
     key: "repositionScroll",
@@ -557,7 +520,7 @@ var Me = function (e) {
       var f = 224;
       var m = 0;
       var v = 0;
-      var y = ["gold", "silver"].includes(this.props.auth.plan);
+      var y = true;
       h.default.createElement("div", {
         className: "ad visible-audio-loaded"
       }, h.default.createElement(fe.default, null));
@@ -578,13 +541,6 @@ var Me = function (e) {
         },
         onFileSelect: function (t) {
           return e.handleFileSelect(t);
-        },
-        isLoggedIn: this.props.auth.isLoggedIn,
-        onLogin: function () {
-          return t(Se.gatherCredentials());
-        },
-        onLogout: function () {
-          return t(Se.logout());
         },
         onHelp: function () {
           return e.setState({
@@ -803,9 +759,6 @@ var Me = function (e) {
         audioBuffer: this.player.audioBuffer,
         tempo: this.props.playback.tempo,
         pitch: this.player.pitch
-      }), h.default.createElement(F.default, {
-        isOpen: this.props.auth.isGatheringRegistration,
-        message: this.props.auth.gatherRegistrationMessage
       }));
     }
   }]);

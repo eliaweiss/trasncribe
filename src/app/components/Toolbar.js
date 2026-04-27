@@ -108,17 +108,7 @@ var c = function (e) {
       var e = this;
       var t = null;
       if (this.props.showSaveNotification) {
-        t = l.default.createElement("div", {
-          className: "btn-group pull-left",
-          style: {
-            marginTop: ".5em",
-            marginLeft: ".5em"
-          }
-        }, l.default.createElement("button", {
-          onClick: this.props.onShowSaveNotification,
-          className: "btn btn-default",
-          title: "Save your work"
-        }, "Save your work"));
+        t = null;
       }
       return l.default.createElement("div", null, l.default.createElement("div", {
         className: "btn-group pull-left",

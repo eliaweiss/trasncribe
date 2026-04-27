@@ -12,8 +12,6 @@ Object.defineProperty(exports, "__esModule", {
 });
 var o = require("../generated/2.js");
 var a = r(o);
-var i = require("../generated/146.js");
-var s = r(i);
 var u = require("./AppProvider.js");
 var appProvider = r(u);
 var l = require("../generated/19.js");
@@ -31,7 +29,7 @@ if (typeof window != "undefined") {
   h.default.render(a.default.createElement(appProvider.default, null), root);
 }
 exports.default = function (e, t) {
-  var n = d.default.renderToString(a.default.createElement(s.default, e));
+  var n = d.default.renderToString(a.default.createElement(appProvider.default, e));
   t(null, "<!DOCTYPE html>" + n);
 };
 module.exports = exports.default;
