@@ -20,9 +20,9 @@ export default function Toolbar(props) {
       </div>
 
       <div className="btn-group pull-left" style={{ clear: "left", marginTop: ".25em" }}>
-        <button className="btn btn-default btn-sm" title="Jump to the start of the file" onClick={onJumpToFileStart}>File Start</button>
-        <button className="btn btn-default btn-sm" disabled={!hasSelectionStart} title="Jump to the start selection line" onClick={onJumpToSelectionStart}>Selection Start</button>
-        <button className="btn btn-default btn-sm" disabled={!hasSelectionEnd} title="Jump to the end selection line" onClick={onJumpToSelectionEnd}>Selection End</button>
+        <button className="btn btn-default" title="Hotkey: F. Jump to the start of the file" onClick={onJumpToFileStart}><u>F</u>ile Start</button>
+        <button className="btn btn-default" disabled={!hasSelectionStart} title="Hotkey: S. Jump to the start selection line" onClick={onJumpToSelectionStart}><u>S</u>election Start</button>
+        <button className="btn btn-default" disabled={!hasSelectionEnd} title="Hotkey: E. Jump to the end selection line" onClick={onJumpToSelectionEnd}>Selection <u>E</u>nd</button>
       </div>
 
       <div className="group" style={{ display: "block" }}>

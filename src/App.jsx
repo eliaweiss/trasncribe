@@ -97,6 +97,11 @@ export default function App() {
     }));
   }, [selection]);
 
+  const jumpToFileStart = useCallback(() => {
+    if (!isLoaded) return;
+    player.seek(0);
+  }, [isLoaded, player]);
+
   const jumpToRatio = useCallback(ratio => {
     if (!isLoaded || !player.duration) return;
     player.seek(player.duration * ratio);
@@ -111,6 +116,30 @@ export default function App() {
     if (selection.end == null) return;
     jumpToRatio(selection.end);
   }, [jumpToRatio, selection.end]);
+
+  useEffect(() => {
+    const onKeyDown = event => {
+      const target = event.target;
+      const isTyping = target && ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName);
+      if (isTyping || event.metaKey || event.ctrlKey || event.altKey) return;
+
+      const key = event.key.toLowerCase();
+      if (key === "f") {
+        event.preventDefault();
+        jumpToFileStart();
+      }
+      if (key === "s") {
+        event.preventDefault();
+        jumpToSelectionStart();
+      }
+      if (key === "e") {
+        event.preventDefault();
+        jumpToSelectionEnd();
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [jumpToFileStart, jumpToSelectionEnd, jumpToSelectionStart]);
 
   useEffect(() => {
     if (!player.duration || selection.end == null) {
@@ -141,7 +170,7 @@ export default function App() {
             fileName={fileName}
             isPlaying={player.isPlaying}
             marks={sortedMarks}
-            onJumpToFileStart={() => player.seek(0)}
+            onJumpToFileStart={jumpToFileStart}
             onJumpToSelectionEnd={jumpToSelectionEnd}
             onJumpToSelectionStart={jumpToSelectionStart}
             onPlayPause={player.playPause}
