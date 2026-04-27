@@ -9136,7 +9136,7 @@
                           {
                             onClick: this.props.onPlay,
                             className: "btn btn-default",
-                            title: "Hotkey: r or space",
+                            title: "Hotkey: r",
                           },
                           "Play",
                         ),
@@ -11295,7 +11295,7 @@
                   if ("undefined" != typeof g.key) {
                     var t = this.props.dispatch;
                     ((0, g.key)("space", function () {
-                      return e.player.play(!0, !0);
+                      return e.player.playPause();
                     }),
                       (0, g.key)("r", function () {
                         return e.player.play(!0, !0);
