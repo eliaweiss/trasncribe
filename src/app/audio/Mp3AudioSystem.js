@@ -37,7 +37,7 @@ var a = function () {
     return t;
   };
 }();
-var i = require("./156.js");
+var i = require("../../generated/156.js");
 var s = r(i);
 var u = function () {
   function e(t) {

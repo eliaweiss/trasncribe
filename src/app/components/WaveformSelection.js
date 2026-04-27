@@ -88,9 +88,9 @@ function s(e, t, n) {
     s = l = undefined;
   }
 }
-var u = require("./2.js");
+var u = require("../../generated/2.js");
 var l = r(u);
-var c = require("./6.js");
+var c = require("../../generated/6.js");
 var p = function (e) {
   function t(e) {
     o(this, t);

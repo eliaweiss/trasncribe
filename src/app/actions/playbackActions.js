@@ -84,4 +84,4 @@ exports.setVolume = s;
 exports.changePitch = u;
 exports.setDelay = l;
 exports.changePlayStatus = c;
-var p = require("./22.js");
+var p = require("../../generated/22.js");

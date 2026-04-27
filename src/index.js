@@ -1,1 +1,1 @@
-module.exports = require("./143.js");
+module.exports = require("./app/entry.js");

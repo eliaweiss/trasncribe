@@ -83,7 +83,7 @@ var s = function () {
   };
 }();
 exports.default = a;
-require("./65.js");
+require("../../generated/65.js");
 var u = {
   currentLoop: {
     start: 0

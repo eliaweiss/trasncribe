@@ -10,19 +10,19 @@ function r(e) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-var o = require("./2.js");
+var o = require("../generated/2.js");
 var a = r(o);
-var i = require("./146.js");
+var i = require("../generated/146.js");
 var s = r(i);
-var u = require("./67.js");
+var u = require("./AppProvider.js");
 r(u);
-var l = require("./19.js");
+var l = require("../generated/19.js");
 var c = r(l);
-var p = require("./204.js");
+var p = require("../generated/204.js");
 var d = r(p);
-var f = require("./33.js");
+var f = require("../generated/33.js");
 var h = r(f);
-require("./278.js");
+require("../generated/278.js");
 if (typeof window != "undefined") {
   c.default.setAppElement(document.body);
   h.default.render(a.default.createElement(s.default, null), document);

@@ -90,7 +90,7 @@ function s(e, t, n) {
 }
 var u = require("./2.js");
 var l = r(u);
-var c = require("./67.js");
+var c = require("../app/AppProvider.js");
 var p = r(c);
 var d = require("./205.js");
 var f = r(d);

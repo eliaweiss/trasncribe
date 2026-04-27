@@ -88,11 +88,11 @@ function s(e, t, n) {
     s = l = undefined;
   }
 }
-var u = require("./2.js");
+var u = require("../../generated/2.js");
 var l = r(u);
-var c = require("./19.js");
+var c = require("../../generated/19.js");
 r(c);
-var p = require("./124.js");
+var p = require("../../generated/124.js");
 var d = r(p);
 var f = function (e) {
   function t(e) {

@@ -1,10 +1,20 @@
-# Source Bundle
+# Source
 
 This folder is the editable source for `../Transcribe Music Online_files/bundle.js`.
 
-The files were recovered from the original Webpack bundle, so many modules are
-still numbered. They are much easier to edit than the generated browser bundle,
-and changes can be rebuilt with:
+Use the named files in `app/` for normal application work:
+
+- `app/App.js` is the main React app.
+- `app/PlaybackController.js` owns play, pause, seek, loops, speed, pitch, and volume.
+- `app/audio/` contains the MP3 and YouTube playback backends.
+- `app/components/` contains the visible UI pieces.
+- `app/actions/` and `app/state/` contain Redux actions and reducers.
+
+The files in `generated/` are recovered Webpack/vendor internals. They are still
+numbered because the original source names were not present in the saved bundle.
+They are intentionally isolated so day-to-day edits do not happen there.
+
+Rebuild the browser bundle with:
 
 ```sh
 npm run build

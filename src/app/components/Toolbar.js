@@ -88,7 +88,7 @@ function s(e, t, n) {
     s = l = undefined;
   }
 }
-var u = require("./2.js");
+var u = require("../../generated/2.js");
 var l = r(u);
 var c = function (e) {
   function t() {

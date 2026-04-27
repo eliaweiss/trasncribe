@@ -10,7 +10,7 @@ function r(e) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-var o = require("./23.js");
+var o = require("../../generated/23.js");
 var a = r(o);
 var i = "not-loaded";
 var s = "loaded";

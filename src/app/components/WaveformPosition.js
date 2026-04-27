@@ -88,74 +88,97 @@ function s(e, t, n) {
     s = l = undefined;
   }
 }
-var u = require("./2.js");
+var u = require("../../generated/2.js");
 var l = r(u);
-var c = function (e) {
+var c = require("../../generated/6.js");
+var p = function (e) {
   function t(e) {
     o(this, t);
     s(Object.getPrototypeOf(t.prototype), "constructor", this).call(this, e);
-    this.state = {};
+    this.update = this.update.bind(this);
+    this.state = {
+      position: 0
+    };
+    this.throttledSetPosition = (0, c.throttle)(this.setPosition, 1000 / 60, this);
   }
   a(t, e);
   i(t, [{
-    key: "mouseEvent",
-    value: function (e, t) {
-      var n = this.refs.main;
-      if (!this.mouseEventing) {
-        this.mouseEventing = true;
-        for (var r = 1; r < n.childNodes.length; r++) {
-          var o = new MouseEvent(t.type, t.nativeEvent);
-          var a = n.childNodes[r].dispatchEvent(o);
-          if (!a) {
-            break;
-          }
-        }
-        this.mouseEventing = false;
-        t.stopPropagation();
+    key: "onClick",
+    value: function (e) {
+      if (this.props.onClick) {
+        var t = (0, c.relX)(e) / this.props.width;
+        this.props.onClick(t);
+        this.setState({
+          position: this.props.getPosition()
+        });
+        e.preventDefault();
+        e.stopPropagation();
       }
+    }
+  }, {
+    key: "onDblClick",
+    value: function (e) {
+      if (this.props.onDoubleClick) {
+        var t = (0, c.relX)(e) / this.props.width;
+        this.props.onDoubleClick(t);
+        this.setState({
+          position: this.props.getPosition()
+        });
+      }
+    }
+  }, {
+    key: "componentWillReceiveProps",
+    value: function (e) {
+      this.update(e);
+    }
+  }, {
+    key: "update",
+    value: function (e) {
+      var t = this;
+      (0, c.cancelAnimationFrame)(this.frameId);
+      this.throttledSetPosition(e);
+      if (e.isPlaying) {
+        this.frameId = (0, c.requestAnimationFrame)(function () {
+          return t.update(t.props);
+        });
+      } else {
+        this.frameId = null;
+      }
+    }
+  }, {
+    key: "setPosition",
+    value: function (e) {
+      this.setState({
+        position: e.getPosition()
+      });
     }
   }, {
     key: "render",
     value: function () {
       var e = this;
+      var t = this.state.position * this.props.width;
       return l.default.createElement("div", {
-        ref: "main",
-        className: "mouse-container",
-        style: {
-          height: this.props.height
-        }
-      }, l.default.createElement("div", {
-        className: "overlay",
-        style: {
-          height: this.props.height,
-          zIndex: 39,
-          width: this.props.width
-        },
         onClick: function (t) {
-          return e.mouseEvent("onMouseClick", t);
-        },
-        onMouseUp: function (t) {
-          return e.mouseEvent("onMouseUp", t);
-        },
-        onMouseDown: function (t) {
-          return e.mouseEvent("onMouseDown", t);
+          return e.onClick(t);
         },
         onDoubleClick: function (t) {
-          return e.mouseEvent("onMouseDoubleClick", t);
+          return e.onDblClick(t);
         },
-        onMouseEnter: function (t) {
-          return e.mouseEvent("onMouseEnter", t);
+        style: {
+          width: this.props.width
         },
-        onMouseLeave: function (t) {
-          return e.mouseEvent("onMouseLeave", t);
-        },
-        onMouseMove: function (t) {
-          return e.mouseEvent("onMouseMove", t);
+        className: this.props.className,
+        id: this.props.id,
+        height: "224"
+      }, l.default.createElement("div", {
+        className: "position-line",
+        style: {
+          left: t
         }
-      }), this.props.children);
+      }));
     }
   }]);
   return t;
 }(l.default.Component);
-exports.default = c;
+exports.default = p;
 module.exports = exports.default;

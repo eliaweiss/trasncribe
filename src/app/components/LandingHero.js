@@ -121,12 +121,12 @@ function u(e, t, n) {
     s = l = undefined;
   }
 }
-var l = require("./2.js");
+var l = require("../../generated/2.js");
 var c = r(l);
-var p = require("./19.js");
+var p = require("../../generated/19.js");
 var d = r(p);
-var f = require("./6.js");
-var h = require("./75.js");
+var f = require("../../generated/6.js");
+var h = require("../../generated/75.js");
 var m = function (e) {
   function t(e) {
     o(this, t);
