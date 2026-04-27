@@ -9386,6 +9386,18 @@
             a(t, e),
             i(t, [
               {
+                key: "onClick",
+                value: function (e) {
+                  if (this.props.onClick) {
+                    var t = (0, c.relX)(e) / this.props.width;
+                    (this.props.onClick(t),
+                      this.setState({ position: this.props.getPosition() }),
+                      e.preventDefault(),
+                      e.stopPropagation());
+                  }
+                },
+              },
+              {
                 key: "onDblClick",
                 value: function (e) {
                   if (this.props.onDoubleClick) {
@@ -9430,6 +9442,9 @@
                   return l.default.createElement(
                     "div",
                     {
+                      onClick: function (t) {
+                        return e.onClick(t);
+                      },
                       onDoubleClick: function (t) {
                         return e.onDblClick(t);
                       },
@@ -11635,6 +11650,9 @@
                             }),
                             h.default.createElement(Q.default, {
                               width: a,
+                              onClick: function (t) {
+                                return e.seekToPlaybackTime(t);
+                              },
                               onDoubleClick: function (t) {
                                 return e.seekToPlaybackTime(t);
                               },
