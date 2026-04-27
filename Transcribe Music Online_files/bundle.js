@@ -13192,6 +13192,7 @@
       setCurrentTime(player.getCurrentTime?.() || 0);
     }, [tempo]);
     const playPause = (0, import_react12.useCallback)(async () => {
+      const loopRange = loopRangeRef.current;
       if (sourceType === "youtube") {
         const player = youtubePlayerRef.current;
         if (!player) return;
@@ -13202,6 +13203,11 @@
           setIsPlaying(false);
           return;
         }
+        const currentVideoTime = player.getCurrentTime?.() || 0;
+        if (loopRange && (currentVideoTime < loopRange.start || currentVideoTime >= loopRange.end)) {
+          player.seekTo(loopRange.start, true);
+          setCurrentTime(loopRange.start);
+        }
         player.setPlaybackRate?.(tempo / 100);
         player.playVideo();
         setIsPlaying(true);
@@ -13210,6 +13216,10 @@
       const audio = audioRef.current;
       if (!audio.src) return;
       if (audio.paused) {
+        if (loopRange && (audio.currentTime < loopRange.start || audio.currentTime >= loopRange.end)) {
+          audio.currentTime = loopRange.start;
+          setCurrentTime(loopRange.start);
+        }
         audio.volume = 1;
         audio.playbackRate = tempo / 100;
         await audio.play();

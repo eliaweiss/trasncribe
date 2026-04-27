@@ -95,6 +95,8 @@ export function useAudioPlayer() {
   }, [tempo]);
 
   const playPause = useCallback(async () => {
+    const loopRange = loopRangeRef.current;
+
     if (sourceType === "youtube") {
       const player = youtubePlayerRef.current;
       if (!player) return;
@@ -104,6 +106,11 @@ export function useAudioPlayer() {
         setCurrentTime(player.getCurrentTime?.() || 0);
         setIsPlaying(false);
         return;
+      }
+      const currentVideoTime = player.getCurrentTime?.() || 0;
+      if (loopRange && (currentVideoTime < loopRange.start || currentVideoTime >= loopRange.end)) {
+        player.seekTo(loopRange.start, true);
+        setCurrentTime(loopRange.start);
       }
       player.setPlaybackRate?.(tempo / 100);
       player.playVideo();
@@ -115,6 +122,10 @@ export function useAudioPlayer() {
     if (!audio.src) return;
 
     if (audio.paused) {
+      if (loopRange && (audio.currentTime < loopRange.start || audio.currentTime >= loopRange.end)) {
+        audio.currentTime = loopRange.start;
+        setCurrentTime(loopRange.start);
+      }
       audio.volume = 1;
       audio.playbackRate = tempo / 100;
       await audio.play();
