@@ -8,4 +8,6 @@ This is now a normal React source tree. The app is written with named components
 - `components/` contains the visible UI: landing page, player, toolbar, waveform timeline, markers, and control panel.
 - `utils/audioBuffer.js` contains audio decoding and time formatting helpers.
 
-`Transcribe Music Online_files/bundle.js` is generated from this source by `npm run build`; edit the files in `src/`, not the bundle.
+Development is served by Vite from `src/main.jsx`; there is no checked-in app bundle.
+Use `npm run dev` for local development and `npm run build` for a normal Vite
+production build in `dist/`.

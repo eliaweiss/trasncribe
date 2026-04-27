@@ -36,7 +36,7 @@ export default function Landing({ onChooseAudio, onLoadYouTube }) {
             </form>
           </div>
           <div id="screenshot" className="main-img">
-            <img src="./Transcribe Music Online_files/screenshot.png" alt="Waveform screenshot" />
+            <img src="/Transcribe Music Online_files/screenshot.png" alt="Waveform screenshot" />
           </div>
         </div>
       </div>

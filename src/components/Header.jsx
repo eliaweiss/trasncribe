@@ -9,7 +9,7 @@ export default function Header({ onChooseAudio, onChooseYouTube }) {
           <span>Menu</span>
         </button>
         <a className="navbar-brand" href="#" onClick={event => event.preventDefault()}>
-          <img src="./Transcribe Music Online_files/logo-blueblock.png" alt="Transcribe Music Online" />
+          <img src="/Transcribe Music Online_files/logo-blueblock.png" alt="Transcribe Music Online" />
         </a>
       </div>
       <div className="collapse navbar-collapse navbar-ex1-collapse">
