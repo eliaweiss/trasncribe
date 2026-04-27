@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 
-const SECTION_DRAG_THRESHOLD_PIXELS = 4;
+const SELECTION_DRAG_THRESHOLD_PIXELS = 4;
+const SELECTION_HANDLE_HIT_RADIUS_PIXELS = 8;
 
 function drawSelection(canvas, selection) {
   const context = canvas.getContext("2d");
@@ -28,11 +29,28 @@ function ratioFromEvent(event, canvas) {
   return Math.max(0, Math.min(1, x / rect.width));
 }
 
+function xFromEvent(event, canvas) {
+  const rect = canvas.getBoundingClientRect();
+  return event.clientX - rect.left;
+}
+
+function handleFromEvent(event, canvas, selection) {
+  const x = xFromEvent(event, canvas);
+  const startX = selection.start * canvas.getBoundingClientRect().width;
+  const endX = selection.end == null ? null : selection.end * canvas.getBoundingClientRect().width;
+
+  if (endX != null && Math.abs(x - endX) <= SELECTION_HANDLE_HIT_RADIUS_PIXELS) return "end";
+  if (Math.abs(x - startX) <= SELECTION_HANDLE_HIT_RADIUS_PIXELS) return "start";
+  return null;
+}
+
 export default function SelectionOverlay({ height, onSeek, selection, setSelection, width }) {
   const canvasRef = useRef(null);
+  const dragModeRef = useRef(null);
   const dragStartRef = useRef(null);
   const hasDraggedRef = useRef(false);
   const pointerStartXRef = useRef(0);
+  const [cursor, setCursor] = useState("crosshair");
   const [isDragging, setIsDragging] = useState(false);
 
   useEffect(() => {
@@ -45,33 +63,69 @@ export default function SelectionOverlay({ height, onSeek, selection, setSelecti
     setSelection({ start: Math.min(dragStartRef.current, current), end: Math.max(dragStartRef.current, current) });
   };
 
+  const updateDraggedHandle = event => {
+    const current = ratioFromEvent(event, canvasRef.current);
+
+    if (dragModeRef.current === "start") {
+      const nextStart = selection.end == null ? current : Math.min(current, selection.end);
+      onSeek(nextStart);
+      setSelection({ start: nextStart, end: selection.end });
+      return;
+    }
+
+    if (dragModeRef.current === "end" && selection.end != null) {
+      const nextEnd = Math.max(current, selection.start);
+      onSeek(nextEnd);
+      setSelection({ start: selection.start, end: nextEnd });
+    }
+  };
+
   const beginSelection = event => {
     event.preventDefault();
     canvasRef.current.setPointerCapture?.(event.pointerId);
-    const start = ratioFromEvent(event, canvasRef.current);
+    const selectedHandle = handleFromEvent(event, canvasRef.current, selection);
     hasDraggedRef.current = false;
     pointerStartXRef.current = event.clientX;
-    dragStartRef.current = start;
+    dragModeRef.current = selectedHandle || "selection";
     setIsDragging(true);
+
+    if (selectedHandle) {
+      setCursor("ew-resize");
+      onSeek(selectedHandle === "start" ? selection.start : selection.end);
+      return;
+    }
+
+    const start = ratioFromEvent(event, canvasRef.current);
+    dragStartRef.current = start;
     onSeek(start);
     setSelection({ start, end: null });
   };
 
   const updateSelection = event => {
-    if (!isDragging) return;
+    if (!isDragging) {
+      setCursor(handleFromEvent(event, canvasRef.current, selection) ? "ew-resize" : "crosshair");
+      return;
+    }
+
     const movedPixels = Math.abs(event.clientX - pointerStartXRef.current);
-    if (movedPixels >= SECTION_DRAG_THRESHOLD_PIXELS) {
+    if (movedPixels >= SELECTION_DRAG_THRESHOLD_PIXELS) {
       hasDraggedRef.current = true;
-      updateSectionEnd(event);
+      if (dragModeRef.current === "selection") updateSectionEnd(event);
+      else updateDraggedHandle(event);
     }
   };
 
   const endSelection = event => {
     if (!isDragging) return;
-    if (hasDraggedRef.current) updateSectionEnd(event);
+    if (hasDraggedRef.current) {
+      if (dragModeRef.current === "selection") updateSectionEnd(event);
+      else updateDraggedHandle(event);
+    }
+    dragModeRef.current = null;
     dragStartRef.current = null;
     hasDraggedRef.current = false;
     setIsDragging(false);
+    setCursor(handleFromEvent(event, canvasRef.current, selection) ? "ew-resize" : "crosshair");
     canvasRef.current.releasePointerCapture?.(event.pointerId);
   };
 
@@ -83,9 +137,12 @@ export default function SelectionOverlay({ height, onSeek, selection, setSelecti
       id="waveform-selection"
       onPointerDown={beginSelection}
       onPointerMove={updateSelection}
+      onPointerLeave={() => {
+        if (!isDragging) setCursor("crosshair");
+      }}
       onPointerUp={endSelection}
       style={{
-        cursor: "crosshair",
+        cursor,
         left: 0,
         MozUserSelect: "none",
         pointerEvents: "auto",
