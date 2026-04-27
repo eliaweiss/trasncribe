@@ -216,7 +216,7 @@ var E = function (e) {
     key: "render",
     value: function () {
       var e = this;
-      var t = this.props.isRegistering ? "Upgrading..." : "Upgrade";
+      var t = this.props.isRegistering ? "Working..." : "Continue";
       var n = this.props.registrationErrors.map(function (e) {
         return c.default.createElement("li", {
           className: "text-danger",
@@ -268,13 +268,13 @@ var E = function (e) {
           return (0, g.default)().login();
         },
         className: "btn btn-primary"
-      }, "Log in")), !r && c.default.createElement("div", {
-        className: "row upgrade-container"
+      }, "Close")), !r && c.default.createElement("div", {
+        className: "row local-save-container"
       }, c.default.createElement("div", {
         className: "col-md-6"
       }, c.default.createElement("div", {
         ref: "stripeContainer"
-      }), c.default.createElement("h2", null, "Upgrade to Pro"), c.default.createElement("ul", null, c.default.createElement("li", null, "Save your marks, loops, and other data."), c.default.createElement("li", null, "Slow down songs to 25% tempo."), c.default.createElement("li", null, "No ads."), c.default.createElement("li", null, "Change pitch without changing tempo."), c.default.createElement("li", null, "Save MP3s with pitch and tempo changed."), c.default.createElement("li", null, "Download and play selected loops as MP3s."), c.default.createElement("li", null, "Data saves automatically to our servers.")), c.default.createElement("small", {
+      }), c.default.createElement("h2", null, "Local saving coming later"), c.default.createElement("ul", null, c.default.createElement("li", null, "Save your marks and loops locally."), c.default.createElement("li", null, "Slow down songs to 25% tempo."), c.default.createElement("li", null, "Change pitch without changing tempo."), c.default.createElement("li", null, "Save MP3s with pitch and tempo changed."), c.default.createElement("li", null, "Download and play selected loops as MP3s.")), c.default.createElement("small", {
         style: {
           color: "#5869FC",
           fontFamily: "Bangers",

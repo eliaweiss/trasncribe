@@ -108,8 +108,6 @@ var c = o(l);
 require("./34.js");
 var p = require("./31.js");
 var d = o(p);
-var f = require("./22.js");
-r(f);
 function h(e, t) {
   return c.default.createElement("div", null, c.default.createElement("h2", {
     className: "question"
@@ -132,7 +130,7 @@ var m = function (e) {
     key: "render",
     value: function () {
       var e = this;
-      var t = ["comments", "tunetranscriber.com"].join("@");
+      var t = "";
       return c.default.createElement(d.default, {
         isOpen: this.props.isOpen,
         onClose: function () {
@@ -150,7 +148,7 @@ var m = function (e) {
             return e.close();
           }
         }, "Close")
-      }, h("How can I preserve my progress?", "Unlock the ability to save your work and access additional features by upgrading to TuneTranscriber Pro. Once upgraded, simply load a song and your progress will be saved automatically."), h("I've already paid for the service, but my work isn't saving. What's wrong?", "Your work should automatically save when you're logged in, and it should reload when you open the same MP3 file or YouTube video. If this isn't functioning correctly, ensure you are signed in, indicated by the presence of 'Log out' in the top right corner."), h("I need something else.", t));
+      }, h("How can I preserve my progress?", "Saving is disabled for now. A localStorage-based save flow will be added later."), h("I need something else.", t));
     }
   }]);
   return t;

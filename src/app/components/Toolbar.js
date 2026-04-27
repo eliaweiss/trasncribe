@@ -103,6 +103,18 @@ var c = function (e) {
       e.preventDefault();
     }
   }, {
+    key: "onPlaybackButtonKeyDown",
+    value: function (e) {
+      if (e.key === " " || e.key === "Spacebar" || e.keyCode === 32) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (e.nativeEvent && e.nativeEvent.stopImmediatePropagation) {
+          e.nativeEvent.stopImmediatePropagation();
+        }
+        this.props.onPause();
+      }
+    }
+  }, {
     key: "render",
     value: function () {
       var e = this;
@@ -117,10 +129,16 @@ var c = function (e) {
         }
       }, l.default.createElement("button", {
         onClick: this.props.onPlay,
+        onKeyDown: function (t) {
+          return e.onPlaybackButtonKeyDown(t);
+        },
         className: "btn btn-default",
-        title: "Hotkey: space"
+        title: "Hotkey: r"
       }, "Play"), l.default.createElement("button", {
         onClick: this.props.onPause,
+        onKeyDown: function (t) {
+          return e.onPlaybackButtonKeyDown(t);
+        },
         className: "btn btn-default",
         title: "Hotkey: p"
       }, "Pause"), l.default.createElement("div", {

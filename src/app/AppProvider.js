@@ -96,8 +96,6 @@ require("../generated/29.js");
 var d = require("../generated/34.js");
 var f = require("../generated/158.js");
 var h = r(f);
-var m = require("../generated/155.js");
-var v = r(m);
 var y = function (e) {
   function t() {
     o(this, t);
@@ -108,7 +106,6 @@ var y = function (e) {
     key: "render",
     value: function () {
       var e = (0, h.default)();
-      (0, v.default)(e);
       return l.default.createElement(d.Provider, {
         store: e
       }, l.default.createElement(p.default, null));

@@ -130,7 +130,7 @@ var E = function (e) {
         content: "website"
       }), l.default.createElement("meta", {
         property: "og:image",
-        content: "https://www.tunetranscriber.com/screenshot.png"
+        content: "screenshot.png"
       }), l.default.createElement("meta", {
         property: "og:description",
         content: "A free online tool to slow down songs and transcribe music."
@@ -148,7 +148,7 @@ var E = function (e) {
         content: "A free online tool to slow down songs and transcribe music."
       }), l.default.createElement("meta", {
         name: "twitter:image:src",
-        content: "https://www.tunetranscriber.com/screenshot.png"
+        content: "screenshot.png"
       }), l.default.createElement("link", {
         rel: "apple-touch-icon",
         sizes: "180x180",

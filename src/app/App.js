@@ -49,11 +49,9 @@ function i(e, t) {
 }
 function s(e) {
   return {
-    auth: e.auth,
     zoom: e.zoom,
     audio: e.audio,
     loops: e.loops,
-    workspace: e.workspace,
     playback: e.playback,
     marks: e.marks.marks
   };
@@ -653,7 +651,7 @@ var Me = function (e) {
         isPlaying: this.props.playback.isPlaying
       })), h.default.createElement(X.default, {
         onPlay: function () {
-          return e.player.playPause();
+          return e.player.play(true, true);
         },
         onPause: function () {
           return e.player.playPause();

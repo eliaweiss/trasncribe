@@ -49,7 +49,7 @@ function o(e) {
       t.preventDefault();
       e.onHelp();
     }
-  }, "Help"))));
+  }, "Help")))));
 }
 Object.defineProperty(exports, "__esModule", {
   value: true

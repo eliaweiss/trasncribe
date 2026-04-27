@@ -19,9 +19,6 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 var a = require("../../generated/29.js");
-var i = require("../../generated/153.js");
-var s = require("../../generated/148.js");
-var u = r(s);
 var l = require("../../generated/154.js");
 var c = r(l);
 var p = require("./loopsReducer.js");
@@ -33,14 +30,12 @@ var v = r(m);
 var y = require("./audioReducer.js");
 var g = r(y);
 var b = {
-  auth: u.default,
   zoom: c.default,
   loops: d.default,
   marks: h.default,
   playback: v.default,
-  workspace: i.workspace,
   audio: g.default
 };
 var E = (0, a.combineReducers)(b);
-exports.default = o([E, i.root]);
+exports.default = E;
 module.exports = exports.default;

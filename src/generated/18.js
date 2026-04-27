@@ -33,7 +33,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.getServerUrl = n;
 exports.loadStripe = r;
 exports.loadPaypal = o;
-var a = "https://server.tunetranscriber.com";
+var a = "";
 var i = "pk_live_P2QoJLgz8pWaQ1CnlEBQKExF";
 exports.stripePk = i;
 var s = "production";

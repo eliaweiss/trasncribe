@@ -42,7 +42,7 @@ function o() {
       }
     },
     login: function (e) {
-      var t = "https://data.tunetranscriber.com";
+      var t = "";
       var n = "https://" + s + "/authorize?response_type=code&client_id=" + u + "&redirect_uri=" + l + "&scope=openid%20profile&audience=" + t;
       if (i && e) {
         window.location = n;
@@ -76,7 +76,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.default = o;
 var a = require("./18.js");
 var i = typeof window == "undefined" ? null : window;
-var s = "tunetranscriber.auth0.com";
+var s = "";
 var u = "2nXDRzErTKkmyUcbXrU6LaKBQaKKIjDF";
 var l = i ? i.location.protocol + "//" + i.location.host + i.location.pathname : "";
 module.exports = exports.default;
