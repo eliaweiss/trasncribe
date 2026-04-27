@@ -111,7 +111,7 @@ var c = function (e) {
         if (e.nativeEvent && e.nativeEvent.stopImmediatePropagation) {
           e.nativeEvent.stopImmediatePropagation();
         }
-        this.props.onPause();
+        this.props.onPlay();
       }
     }
   }, {
@@ -133,15 +133,8 @@ var c = function (e) {
           return e.onPlaybackButtonKeyDown(t);
         },
         className: "btn btn-default",
-        title: "Hotkey: r"
-      }, "Play"), l.default.createElement("button", {
-        onClick: this.props.onPause,
-        onKeyDown: function (t) {
-          return e.onPlaybackButtonKeyDown(t);
-        },
-        className: "btn btn-default",
-        title: "Hotkey: p"
-      }, "Pause"), l.default.createElement("div", {
+        title: "Hotkey: space"
+      }, "Play/Pause"), l.default.createElement("div", {
         className: "btn-group"
       }, l.default.createElement("button", {
         type: "button",

@@ -651,9 +651,6 @@ var Me = function (e) {
         isPlaying: this.props.playback.isPlaying
       })), h.default.createElement(X.default, {
         onPlay: function () {
-          return e.player.play(true, true);
-        },
-        onPause: function () {
           return e.player.playPause();
         },
         onJumpToStart: function () {

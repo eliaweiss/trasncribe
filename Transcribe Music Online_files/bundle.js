@@ -16056,7 +16056,7 @@
               if (e3.nativeEvent && e3.nativeEvent.stopImmediatePropagation) {
                 e3.nativeEvent.stopImmediatePropagation();
               }
-              this.props.onPause();
+              this.props.onPlay();
             }
           }
         }, {
@@ -16078,15 +16078,8 @@
                 return e3.onPlaybackButtonKeyDown(t3);
               },
               className: "btn btn-default",
-              title: "Hotkey: r"
-            }, "Play"), l.default.createElement("button", {
-              onClick: this.props.onPause,
-              onKeyDown: function(t3) {
-                return e3.onPlaybackButtonKeyDown(t3);
-              },
-              className: "btn btn-default",
-              title: "Hotkey: p"
-            }, "Pause"), l.default.createElement("div", {
+              title: "Hotkey: space"
+            }, "Play/Pause"), l.default.createElement("div", {
               className: "btn-group"
             }, l.default.createElement("button", {
               type: "button",
@@ -20459,9 +20452,6 @@
               isPlaying: this.props.playback.isPlaying
             })), h.default.createElement(X.default, {
               onPlay: function() {
-                return e3.player.play(true, true);
-              },
-              onPause: function() {
                 return e3.player.playPause();
               },
               onJumpToStart: function() {
