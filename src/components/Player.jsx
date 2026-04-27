@@ -21,8 +21,6 @@ export default function Player(props) {
     onSetTempo,
     onZoom,
     selection,
-    selectionMode,
-    setSelectionMode,
     sourceType,
     tempo,
     youtubeVideoId,
@@ -56,7 +54,6 @@ export default function Player(props) {
           onSetSelection={onSetSelection}
           position={position}
           selection={selection}
-          selectionMode={selectionMode}
           width={width}
         />
       </div>
@@ -74,8 +71,6 @@ export default function Player(props) {
           onJumpToSelectionStart={onJumpToSelectionStart}
           onPlayPause={onPlayPause}
           onSetTempo={onSetTempo}
-          selectionMode={selectionMode}
-          setSelectionMode={setSelectionMode}
           tempo={tempo}
         />
       </div>

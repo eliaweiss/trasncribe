@@ -6,7 +6,7 @@ import MarkerOverlay from "./MarkerOverlay.jsx";
 
 const HEIGHT = 224;
 
-export default function Timeline({ audioBuffer, duration, marks, onSeek, onSetSelection, position, selection, selectionMode, width }) {
+export default function Timeline({ audioBuffer, duration, marks, onSeek, onSetSelection, position, selection, width }) {
   const canvasRef = useRef(null);
 
   return (
@@ -21,7 +21,6 @@ export default function Timeline({ audioBuffer, duration, marks, onSeek, onSetSe
         height={HEIGHT}
         onSeek={onSeek}
         selection={selection}
-        selectionMode={selectionMode}
         setSelection={onSetSelection}
         width={width}
       />

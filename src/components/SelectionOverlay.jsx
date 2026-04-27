@@ -1,5 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 
+const SECTION_DRAG_THRESHOLD_PIXELS = 4;
+
 function drawSelection(canvas, selection) {
   const context = canvas.getContext("2d");
   const width = canvas.width;
@@ -26,9 +28,11 @@ function ratioFromEvent(event, canvas) {
   return Math.max(0, Math.min(1, x / rect.width));
 }
 
-export default function SelectionOverlay({ height, onSeek, selection, selectionMode, setSelection, width }) {
+export default function SelectionOverlay({ height, onSeek, selection, setSelection, width }) {
   const canvasRef = useRef(null);
   const dragStartRef = useRef(null);
+  const hasDraggedRef = useRef(false);
+  const pointerStartXRef = useRef(0);
   const [isDragging, setIsDragging] = useState(false);
 
   useEffect(() => {
@@ -45,27 +49,28 @@ export default function SelectionOverlay({ height, onSeek, selection, selectionM
     event.preventDefault();
     canvasRef.current.setPointerCapture?.(event.pointerId);
     const start = ratioFromEvent(event, canvasRef.current);
+    hasDraggedRef.current = false;
+    pointerStartXRef.current = event.clientX;
+    dragStartRef.current = start;
+    setIsDragging(true);
     onSeek(start);
     setSelection({ start, end: null });
-
-    if (selectionMode === "section") {
-      dragStartRef.current = start;
-      setIsDragging(true);
-    } else {
-      dragStartRef.current = null;
-      setIsDragging(false);
-    }
   };
 
   const updateSelection = event => {
     if (!isDragging) return;
-    updateSectionEnd(event);
+    const movedPixels = Math.abs(event.clientX - pointerStartXRef.current);
+    if (movedPixels >= SECTION_DRAG_THRESHOLD_PIXELS) {
+      hasDraggedRef.current = true;
+      updateSectionEnd(event);
+    }
   };
 
   const endSelection = event => {
     if (!isDragging) return;
-    updateSectionEnd(event);
+    if (hasDraggedRef.current) updateSectionEnd(event);
     dragStartRef.current = null;
+    hasDraggedRef.current = false;
     setIsDragging(false);
     canvasRef.current.releasePointerCapture?.(event.pointerId);
   };
@@ -80,7 +85,7 @@ export default function SelectionOverlay({ height, onSeek, selection, selectionM
       onPointerMove={updateSelection}
       onPointerUp={endSelection}
       style={{
-        cursor: selectionMode === "section" ? "crosshair" : "pointer",
+        cursor: "crosshair",
         left: 0,
         MozUserSelect: "none",
         pointerEvents: "auto",

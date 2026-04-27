@@ -12833,6 +12833,7 @@
 
   // src/components/SelectionOverlay.jsx
   var import_react5 = __toESM(require_react());
+  var SECTION_DRAG_THRESHOLD_PIXELS = 4;
   function drawSelection(canvas, selection) {
     const context = canvas.getContext("2d");
     const width = canvas.width;
@@ -12854,9 +12855,11 @@
     const x = event.clientX - rect.left;
     return Math.max(0, Math.min(1, x / rect.width));
   }
-  function SelectionOverlay({ height, onSeek, selection, selectionMode, setSelection, width }) {
+  function SelectionOverlay({ height, onSeek, selection, setSelection, width }) {
     const canvasRef = (0, import_react5.useRef)(null);
     const dragStartRef = (0, import_react5.useRef)(null);
+    const hasDraggedRef = (0, import_react5.useRef)(false);
+    const pointerStartXRef = (0, import_react5.useRef)(0);
     const [isDragging, setIsDragging] = (0, import_react5.useState)(false);
     (0, import_react5.useEffect)(() => {
       if (canvasRef.current) drawSelection(canvasRef.current, selection);
@@ -12870,24 +12873,26 @@
       event.preventDefault();
       canvasRef.current.setPointerCapture?.(event.pointerId);
       const start = ratioFromEvent(event, canvasRef.current);
+      hasDraggedRef.current = false;
+      pointerStartXRef.current = event.clientX;
+      dragStartRef.current = start;
+      setIsDragging(true);
       onSeek(start);
       setSelection({ start, end: null });
-      if (selectionMode === "section") {
-        dragStartRef.current = start;
-        setIsDragging(true);
-      } else {
-        dragStartRef.current = null;
-        setIsDragging(false);
-      }
     };
     const updateSelection = (event) => {
       if (!isDragging) return;
-      updateSectionEnd(event);
+      const movedPixels = Math.abs(event.clientX - pointerStartXRef.current);
+      if (movedPixels >= SECTION_DRAG_THRESHOLD_PIXELS) {
+        hasDraggedRef.current = true;
+        updateSectionEnd(event);
+      }
     };
     const endSelection = (event) => {
       if (!isDragging) return;
-      updateSectionEnd(event);
+      if (hasDraggedRef.current) updateSectionEnd(event);
       dragStartRef.current = null;
+      hasDraggedRef.current = false;
       setIsDragging(false);
       canvasRef.current.releasePointerCapture?.(event.pointerId);
     };
@@ -12902,7 +12907,7 @@
         onPointerMove: updateSelection,
         onPointerUp: endSelection,
         style: {
-          cursor: selectionMode === "section" ? "crosshair" : "pointer",
+          cursor: "crosshair",
           left: 0,
           MozUserSelect: "none",
           pointerEvents: "auto",
@@ -12925,7 +12930,7 @@
 
   // src/components/Timeline.jsx
   var HEIGHT = 224;
-  function Timeline({ audioBuffer, duration, marks, onSeek, onSetSelection, position, selection, selectionMode, width }) {
+  function Timeline({ audioBuffer, duration, marks, onSeek, onSetSelection, position, selection, width }) {
     const canvasRef = (0, import_react7.useRef)(null);
     return /* @__PURE__ */ import_react7.default.createElement("div", { className: "mouse-container", style: { height: HEIGHT, position: "relative" } }, /* @__PURE__ */ import_react7.default.createElement(MarkerOverlay, { marks, width }), /* @__PURE__ */ import_react7.default.createElement(TimeTicks, { duration, width }), /* @__PURE__ */ import_react7.default.createElement(WaveformCanvas_default, { ref: canvasRef, audioBuffer, height: HEIGHT - 18, width }), /* @__PURE__ */ import_react7.default.createElement("div", { className: "overlay", id: "waveform-position", style: { pointerEvents: "none", width }, height: HEIGHT }, /* @__PURE__ */ import_react7.default.createElement("div", { className: "position-line", style: { left: `${position * width}px` } })), /* @__PURE__ */ import_react7.default.createElement(
       SelectionOverlay,
@@ -12933,7 +12938,6 @@
         height: HEIGHT,
         onSeek,
         selection,
-        selectionMode,
         setSelection: onSetSelection,
         width
       }
@@ -12951,27 +12955,9 @@
       onJumpToSelectionStart,
       onPlayPause,
       onSetTempo,
-      selectionMode,
-      setSelectionMode,
       tempo
     } = props;
-    return /* @__PURE__ */ import_react8.default.createElement("div", null, /* @__PURE__ */ import_react8.default.createElement("div", { className: "btn-group pull-left", style: { marginTop: ".5em" } }, /* @__PURE__ */ import_react8.default.createElement("button", { className: "btn btn-default", title: "Hotkey: space", onClick: onPlayPause }, "Play/Pause"), /* @__PURE__ */ import_react8.default.createElement("button", { type: "button", className: "btn btn-default dropdown-toggle", "data-toggle": "dropdown" }, "Settings")), /* @__PURE__ */ import_react8.default.createElement("div", { className: "btn-group pull-left", style: { clear: "left", marginTop: ".25em" } }, /* @__PURE__ */ import_react8.default.createElement("button", { className: "btn btn-default btn-sm", title: "Jump to the start of the file", onClick: onJumpToFileStart }, "File Start"), /* @__PURE__ */ import_react8.default.createElement("button", { className: "btn btn-default btn-sm", disabled: !hasSelectionStart, title: "Jump to the start selection line", onClick: onJumpToSelectionStart }, "Selection Start"), /* @__PURE__ */ import_react8.default.createElement("button", { className: "btn btn-default btn-sm", disabled: !hasSelectionEnd, title: "Jump to the end selection line", onClick: onJumpToSelectionEnd }, "Selection End")), /* @__PURE__ */ import_react8.default.createElement("div", { className: "btn-group pull-left", style: { clear: "left", marginTop: ".25em" } }, /* @__PURE__ */ import_react8.default.createElement(
-      "button",
-      {
-        className: `btn btn-default btn-sm ${selectionMode === "start" ? "active" : ""}`,
-        onClick: () => setSelectionMode("start"),
-        type: "button"
-      },
-      "Place Start"
-    ), /* @__PURE__ */ import_react8.default.createElement(
-      "button",
-      {
-        className: `btn btn-default btn-sm ${selectionMode === "section" ? "active" : ""}`,
-        onClick: () => setSelectionMode("section"),
-        type: "button"
-      },
-      "Select Section"
-    )), /* @__PURE__ */ import_react8.default.createElement("div", { className: "group", style: { display: "block" } }, /* @__PURE__ */ import_react8.default.createElement("span", { className: "flashicon emboss", style: { marginLeft: "-1em" } }, "Slow"), /* @__PURE__ */ import_react8.default.createElement(
+    return /* @__PURE__ */ import_react8.default.createElement("div", null, /* @__PURE__ */ import_react8.default.createElement("div", { className: "btn-group pull-left", style: { marginTop: ".5em" } }, /* @__PURE__ */ import_react8.default.createElement("button", { className: "btn btn-default", title: "Hotkey: space", onClick: onPlayPause }, "Play/Pause"), /* @__PURE__ */ import_react8.default.createElement("button", { type: "button", className: "btn btn-default dropdown-toggle", "data-toggle": "dropdown" }, "Settings")), /* @__PURE__ */ import_react8.default.createElement("div", { className: "btn-group pull-left", style: { clear: "left", marginTop: ".25em" } }, /* @__PURE__ */ import_react8.default.createElement("button", { className: "btn btn-default btn-sm", title: "Jump to the start of the file", onClick: onJumpToFileStart }, "File Start"), /* @__PURE__ */ import_react8.default.createElement("button", { className: "btn btn-default btn-sm", disabled: !hasSelectionStart, title: "Jump to the start selection line", onClick: onJumpToSelectionStart }, "Selection Start"), /* @__PURE__ */ import_react8.default.createElement("button", { className: "btn btn-default btn-sm", disabled: !hasSelectionEnd, title: "Jump to the end selection line", onClick: onJumpToSelectionEnd }, "Selection End")), /* @__PURE__ */ import_react8.default.createElement("div", { className: "group", style: { display: "block" } }, /* @__PURE__ */ import_react8.default.createElement("span", { className: "flashicon emboss", style: { marginLeft: "-1em" } }, "Slow"), /* @__PURE__ */ import_react8.default.createElement(
       "input",
       {
         "aria-label": "Tempo",
@@ -13075,8 +13061,6 @@
       onSetTempo,
       onZoom,
       selection,
-      selectionMode,
-      setSelectionMode,
       sourceType,
       tempo,
       youtubeVideoId,
@@ -13095,7 +13079,6 @@
         onSetSelection,
         position,
         selection,
-        selectionMode,
         width
       }
     )), /* @__PURE__ */ import_react10.default.createElement("div", { id: "toolbar", className: "clear-group" }, /* @__PURE__ */ import_react10.default.createElement("div", { className: "pull-right" }, /* @__PURE__ */ import_react10.default.createElement("div", { className: "currentTime" }, formatPreciseTime(currentTime))), /* @__PURE__ */ import_react10.default.createElement(
@@ -13109,8 +13092,6 @@
         onJumpToSelectionStart,
         onPlayPause,
         onSetTempo,
-        selectionMode,
-        setSelectionMode,
         tempo
       }
     )));
@@ -13315,7 +13296,6 @@
     const [audioBuffer, setAudioBuffer] = (0, import_react13.useState)(null);
     const [fileName, setFileName] = (0, import_react13.useState)("");
     const [selection, setSelection] = (0, import_react13.useState)({ start: 0, end: null });
-    const [selectionMode, setSelectionMode] = (0, import_react13.useState)("start");
     const [marks, setMarks] = (0, import_react13.useState)([]);
     const [zoom, setZoom] = (0, import_react13.useState)(1);
     const player = useAudioPlayer();
@@ -13419,8 +13399,6 @@
         onYouTubePlayerReady: player.attachYouTubePlayer,
         onZoom: setZoom,
         selection,
-        selectionMode,
-        setSelectionMode,
         sourceType: player.sourceType,
         tempo: player.tempo,
         youtubeVideoId: player.youtubeVideoId,

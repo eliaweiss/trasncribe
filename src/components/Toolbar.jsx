@@ -9,8 +9,6 @@ export default function Toolbar(props) {
     onJumpToSelectionStart,
     onPlayPause,
     onSetTempo,
-    selectionMode,
-    setSelectionMode,
     tempo,
   } = props;
 
@@ -25,23 +23,6 @@ export default function Toolbar(props) {
         <button className="btn btn-default btn-sm" title="Jump to the start of the file" onClick={onJumpToFileStart}>File Start</button>
         <button className="btn btn-default btn-sm" disabled={!hasSelectionStart} title="Jump to the start selection line" onClick={onJumpToSelectionStart}>Selection Start</button>
         <button className="btn btn-default btn-sm" disabled={!hasSelectionEnd} title="Jump to the end selection line" onClick={onJumpToSelectionEnd}>Selection End</button>
-      </div>
-
-      <div className="btn-group pull-left" style={{ clear: "left", marginTop: ".25em" }}>
-        <button
-          className={`btn btn-default btn-sm ${selectionMode === "start" ? "active" : ""}`}
-          onClick={() => setSelectionMode("start")}
-          type="button"
-        >
-          Place Start
-        </button>
-        <button
-          className={`btn btn-default btn-sm ${selectionMode === "section" ? "active" : ""}`}
-          onClick={() => setSelectionMode("section")}
-          type="button"
-        >
-          Select Section
-        </button>
       </div>
 
       <div className="group" style={{ display: "block" }}>

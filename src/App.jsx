@@ -12,7 +12,6 @@ export default function App() {
   const [audioBuffer, setAudioBuffer] = useState(null);
   const [fileName, setFileName] = useState("");
   const [selection, setSelection] = useState({ start: 0, end: null });
-  const [selectionMode, setSelectionMode] = useState("start");
   const [marks, setMarks] = useState([]);
   const [zoom, setZoom] = useState(1);
   const player = useAudioPlayer();
@@ -141,8 +140,6 @@ export default function App() {
             onYouTubePlayerReady={player.attachYouTubePlayer}
             onZoom={setZoom}
             selection={selection}
-            selectionMode={selectionMode}
-            setSelectionMode={setSelectionMode}
             sourceType={player.sourceType}
             tempo={player.tempo}
             youtubeVideoId={player.youtubeVideoId}
