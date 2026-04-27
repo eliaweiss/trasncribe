@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useLayoutEffect, useMemo, useRef } from "react";
 import { formatPreciseTime } from "../utils/audioBuffer.js";
 import Timeline from "./Timeline.jsx";
 import Toolbar from "./Toolbar.jsx";
@@ -28,8 +28,33 @@ export default function Player(props) {
     zoom,
   } = props;
 
+  const displayRef = useRef(null);
+  const previousZoomRef = useRef(zoom);
   const position = duration ? currentTime / duration : 0;
   const width = useMemo(() => Math.max(window.innerWidth * zoom, window.innerWidth), [zoom]);
+
+  useLayoutEffect(() => {
+    const display = displayRef.current;
+    if (!display) return;
+
+    const cursorX = position * width;
+    const visibleStart = display.scrollLeft;
+    const visibleEnd = visibleStart + display.clientWidth;
+    const zoomChanged = previousZoomRef.current !== zoom;
+    const padding = Math.min(120, display.clientWidth / 4);
+
+    if (zoomChanged) {
+      display.scrollLeft = Math.max(0, cursorX - display.clientWidth / 2);
+      previousZoomRef.current = zoom;
+      return;
+    }
+
+    if (cursorX < visibleStart + padding) {
+      display.scrollLeft = Math.max(0, cursorX - padding);
+    } else if (cursorX > visibleEnd - padding) {
+      display.scrollLeft = cursorX - display.clientWidth + padding;
+    }
+  }, [position, width, zoom]);
 
   return (
     <div id="player" className="visible-audio-loaded" style={{ marginLeft: 0 }}>
@@ -42,7 +67,7 @@ export default function Player(props) {
         <h1>{fileName || "Audio File"}</h1>
       </div>
 
-      <div id="display">
+      <div id="display" ref={displayRef} style={{ overflowX: "auto" }}>
         {sourceType === "youtube" && youtubeVideoId && (
           <YouTubePlayer onPlayerReady={onYouTubePlayerReady} videoId={youtubeVideoId} />
         )}
