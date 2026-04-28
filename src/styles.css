@@ -127,6 +127,24 @@ button {
   box-shadow: 0 6px 22px rgba(0, 0, 0, 0.36), inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
+.github-link {
+  align-items: center;
+  border-radius: 50%;
+  color: rgba(180, 190, 255, 0.7);
+  display: inline-flex;
+  flex-shrink: 0;
+  justify-content: center;
+  padding: 6px;
+  text-decoration: none;
+  transition: color 0.18s ease, background 0.18s ease, transform 0.18s ease;
+}
+
+.github-link:hover {
+  background: rgba(139, 157, 255, 0.1);
+  color: #fff;
+  transform: translateY(-1px);
+}
+
 /* ---------- App stage / cards ---------- */
 
 .app-stage {

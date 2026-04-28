@@ -1,6 +1,6 @@
 import React from "react";
 import WaveformLogo from "./WaveformLogo.jsx";
-import { UploadIcon, YouTubeIcon } from "./Icons.jsx";
+import { UploadIcon, YouTubeIcon, GitHubIcon } from "./Icons.jsx";
 
 export default function Header({ onChooseAudio, onChooseYouTube }) {
   return (
@@ -30,6 +30,16 @@ export default function Header({ onChooseAudio, onChooseYouTube }) {
           <YouTubeIcon size={18} />
           Choose YouTube
         </button>
+        <a
+          href="https://github.com/eliaweiss/trasncribe"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="github-link"
+          aria-label="View source on GitHub"
+          title="View source on GitHub"
+        >
+          <GitHubIcon size={20} />
+        </a>
       </div>
     </header>
   );
