@@ -7,15 +7,25 @@ export default function ControlPanel({ duration, marks, onAddLoop, onAddMark, on
 
   return (
     <aside className="control-panel panel-card visible-audio-loaded">
-      <h2>markers</h2>
+      <div className="panel-heading">
+        <span className="heading-icon" aria-hidden="true">{"\u2691"}</span>
+        <span>Markers</span>
+      </div>
       <div className="marker-actions">
-        <button className="pill-button pill-button-primary" title="You can also tap 'm' to add a mark" onClick={onAddMark}>Add Mark</button>
-        <button className="soft-button marker-loop-button" title="Save the current selection as a loop" onClick={onAddLoop}>Add Loop</button>
+        <button className="soft-button marker-mark-button" title="You can also tap 'm' to add a mark" onClick={onAddMark}>
+          <span aria-hidden="true">{"\u2691"}</span>
+          Add Mark
+        </button>
+        <button className="soft-button marker-loop-button" title="Save the current selection as a loop" onClick={onAddLoop}>
+          <span aria-hidden="true">{"\u21c4"}</span>
+          Add Loop
+        </button>
       </div>
 
       {!visibleMarks.length && !loops.length && (
         <p id="empty-mark-message">
-          Tap Add Mark while playing to label parts of the song.
+          <span>No markers or loops added yet.</span>
+          <small>Use the buttons to add markers or create loops.</small>
         </p>
       )}
 

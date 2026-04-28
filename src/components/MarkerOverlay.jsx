@@ -20,9 +20,9 @@ export default function MarkerOverlay({ marks, width }) {
         >
           <div
             style={{
-              background: "#f59e0b",
+              background: "linear-gradient(135deg, #8b5cff, #23d6ff)",
               borderRadius: "2px",
-              boxShadow: "0 1px 3px rgba(0, 0, 0, 0.25)",
+              boxShadow: "0 0 12px rgba(35, 214, 255, 0.45)",
               height: 14,
               left: 2,
               position: "absolute",
@@ -32,9 +32,9 @@ export default function MarkerOverlay({ marks, width }) {
           />
           <div
             style={{
-              background: "#f59e0b",
+              background: "#23d6ff",
               bottom: 0,
-              boxShadow: "0 0 0 1px rgba(255, 255, 255, 0.35)",
+              boxShadow: "0 0 16px rgba(35, 214, 255, 0.55)",
               position: "absolute",
               top: 0,
               width: 2,

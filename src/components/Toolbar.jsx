@@ -22,14 +22,15 @@ function Stepper({ disabled = false, label, max, min, onChange, step, value }) {
   return (
     <div className="stepper">
       <div className="stepper-label">{label}</div>
+      <div className="stepper-number">{value}</div>
       <div className="stepper-controls">
         <button
           className="round-stepper"
-          disabled={disabled || value >= max}
-          onClick={() => onChange(value + step)}
+          disabled={disabled || value <= min}
+          onClick={() => onChange(value - step)}
           type="button"
         >
-          +
+          -
         </button>
         <input
           aria-label={label}
@@ -50,11 +51,11 @@ function Stepper({ disabled = false, label, max, min, onChange, step, value }) {
         />
         <button
           className="round-stepper"
-          disabled={disabled || value <= min}
-          onClick={() => onChange(value - step)}
+          disabled={disabled || value >= max}
+          onClick={() => onChange(value + step)}
           type="button"
         >
-          -
+          +
         </button>
       </div>
     </div>
@@ -69,7 +70,7 @@ function ResetButton({ className = "", disabled = false, onClick }) {
       onClick={onClick}
       type="button"
     >
-      reset
+      Reset
     </button>
   );
 }
@@ -77,6 +78,7 @@ function ResetButton({ className = "", disabled = false, onClick }) {
 export default function Toolbar(props) {
   const {
     currentTimeLabel,
+    durationLabel,
     hasSelectionEnd,
     hasSelectionStart,
     isPlaying,
@@ -100,23 +102,18 @@ export default function Toolbar(props) {
   return (
     <>
       <div className="transport-panel">
-        <div className="state-readout">
-          <span>{isPlaying ? "Playing" : "Pause"}</span>
-          <span>is_playing: {String(isPlaying)}</span>
-        </div>
         <button className="play-button" title="Hotkey: space" onClick={onPlayPause} type="button">
-          <span className="play-icon" aria-hidden="true">||</span>
-          <span>{isPlaying ? "Pause" : "Pause"}</span>
+          <span className="play-icon" aria-hidden="true">{isPlaying ? "||" : "\u25b6"}</span>
         </button>
-        <button type="button" className="settings-button" title="Settings">
-          <span aria-hidden="true">{"\u2699"}</span>
-          <span>settings</span>
-        </button>
-        <div className="time-badge">{currentTimeLabel}</div>
+        <div className="time-badge">
+          <strong>{currentTimeLabel}</strong>
+          <span>/ {durationLabel}</span>
+        </div>
       </div>
 
       <div className="panel-card selection-card">
-        <h2>selection_controls</h2>
+        <h2>Selection</h2>
+        <div className="selection-actions">
         <button className="text-row-button" title="Hotkey: F. Jump to the start of the file" onClick={onJumpToFileStart} type="button">
           File Start
         </button>
@@ -126,21 +123,41 @@ export default function Toolbar(props) {
         <button className="text-row-button" disabled={!hasSelectionEnd} title="Hotkey: E. Jump to the end selection line" onClick={onJumpToSelectionEnd} type="button">
           Selection End
         </button>
-      </div>
-
-      <div className="audio-title">audio_controls</div>
-
-      <div className="panel-card speed-card">
-        <div className="speed-label">Speed</div>
-        <div className="speed-value">{tempo}%</div>
-        <div className="speed-actions">
-          <button className="round-stepper" disabled={tempo >= 200} onClick={() => onSetTempo(tempo + 5)} type="button">+</button>
-          <button className="round-stepper" disabled={tempo <= 25} onClick={() => onSetTempo(tempo - 5)} type="button">-</button>
-          <ResetButton disabled={tempo === 100} onClick={() => onSetTempo(100)} />
         </div>
       </div>
 
+      <button type="button" className="settings-button" title="Settings">
+        <span aria-hidden="true">{"\u2699"}</span>
+      </button>
+
+      <div className="panel-card speed-card">
+        <div className="panel-heading">
+          <span className="heading-icon" aria-hidden="true">{"\u25f4"}</span>
+          <span>Speed</span>
+        </div>
+        <div className="speed-value">{tempo}%</div>
+        <div className="speed-actions">
+          <button className="soft-button" disabled={tempo <= 25} onClick={() => onSetTempo(tempo - 5)} type="button">-</button>
+          <ResetButton disabled={tempo === 100} onClick={() => onSetTempo(100)} />
+          <button className="soft-button" disabled={tempo >= 200} onClick={() => onSetTempo(tempo + 5)} type="button">+</button>
+        </div>
+        <input
+          aria-label="Playback speed"
+          className="speed-slider"
+          max="200"
+          min="25"
+          onChange={event => onSetTempo(Number(event.target.value))}
+          step="5"
+          type="range"
+          value={tempo}
+        />
+      </div>
+
       <div className="panel-card pitch-card">
+        <div className="panel-heading pitch-heading">
+          <span className="heading-icon" aria-hidden="true">{"\u223f"}</span>
+          <span>Pitch</span>
+        </div>
         <Stepper
           disabled={!canShiftPitch}
           label="Octaves"

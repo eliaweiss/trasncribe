@@ -1,45 +1,56 @@
-import React, { useState } from "react";
+import React from "react";
 
 export default function Landing({ onChooseAudio, onLoadYouTube }) {
-  const [youtubeUrl, setYoutubeUrl] = useState("");
+  const requestYouTubeLink = () => {
+    const url = window.prompt("Paste a YouTube URL");
+    if (url) onLoadYouTube(url);
+  };
 
   return (
-    <div id="landing">
-      <div className="container">
-        <div className="hero-cont">
-          <div className="hero">
-            <h1 className="title">
-              <span className="bb">Transcribe</span> music
-              <span style={{ display: "block", paddingTop: 20 }}>like a pro.</span>
-            </h1>
-            <h2 className="tagline" style={{ marginBottom: "1.5em" }}>
-              Slow down your favorite songs so you can learn how they are played.
-            </h2>
-            <button className="btn btn-primary btn-lg" onClick={onChooseAudio}>Load an MP3</button>
-            <form
-              className="form-inline"
-              style={{ marginTop: "1em" }}
-              onSubmit={event => {
-                event.preventDefault();
-                onLoadYouTube(youtubeUrl);
-              }}
-            >
-              <input
-                aria-label="YouTube URL"
-                className="form-control input-lg"
-                onChange={event => setYoutubeUrl(event.target.value)}
-                placeholder="Paste a YouTube URL"
-                type="text"
-                value={youtubeUrl}
-              />{" "}
-              <button className="btn btn-primary btn-lg" type="submit">Load YouTube Video</button>
-            </form>
+    <main id="landing" aria-label="Start screen">
+      <section className="landing-shell">
+        <div className="landing-hero">
+          <div className="landing-wave" aria-hidden="true">
+            <span />
           </div>
-          <div id="screenshot" className="main-img">
-            <img src="/Transcribe Music Online_files/screenshot.png" alt="Waveform screenshot" />
-          </div>
+
+          <h1>Welcome to Music Transcriber</h1>
+          <p>
+            Upload an audio file or enter a YouTube link to get started.
+            <span>Transcribe, analyze, and explore your music with precision.</span>
+          </p>
         </div>
-      </div>
-    </div>
+
+        <div className="start-options">
+          <article className="start-card upload-card">
+            <div className="start-card-icon" aria-hidden="true">{"\u21e7"}</div>
+            <h2>Upload Audio File</h2>
+            <p>Upload MP3, WAV, FLAC, M4A or other audio formats.</p>
+            <button className="start-action primary-start-action" onClick={onChooseAudio} type="button">
+              Choose File
+            </button>
+          </article>
+
+          <div className="option-divider" aria-hidden="true">or</div>
+
+          <article className="start-card youtube-card">
+            <div className="start-card-icon" aria-hidden="true">{"\u25b6"}</div>
+            <h2>Enter YouTube Link</h2>
+            <p>Paste a YouTube link to extract and transcribe the audio.</p>
+            <button className="start-action youtube-start-action" onClick={requestYouTubeLink} type="button">
+              Enter YouTube Link
+            </button>
+          </article>
+        </div>
+
+        <aside className="format-note">
+          <span className="format-icon" aria-hidden="true">{"\u25cc"}</span>
+          <p>
+            <strong>Supported formats:</strong> MP3, WAV, FLAC, M4A, OGG, AAC and more.
+            <span>For best results, use high quality audio files.</span>
+          </p>
+        </aside>
+      </section>
+    </main>
   );
 }

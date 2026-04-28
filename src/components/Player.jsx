@@ -35,6 +35,7 @@ export default function Player(props) {
   const position = duration ? currentTime / duration : 0;
   const width = useMemo(() => Math.max(window.innerWidth * zoom, window.innerWidth), [zoom]);
   const currentTimeLabel = formatPreciseTime(currentTime);
+  const durationLabel = formatPreciseTime(duration);
 
   useLayoutEffect(() => {
     const display = displayRef.current;
@@ -63,6 +64,30 @@ export default function Player(props) {
     <div id="player" className="player-panel visible-audio-loaded">
       <div className="track-title">{fileName || "Audio File"}</div>
 
+      <div className="waveform-topbar">
+        <div className="track-meta">
+          <span className="track-icon" aria-hidden="true">{"\u266b"}</span>
+          <span>{fileName || "Audio File"}</span>
+        </div>
+        <div className="zoom-controls" aria-label="Waveform zoom">
+          <button type="button" className="icon-button" onClick={() => onZoom(Math.max(1, zoom - 1))} aria-label="Zoom out">
+            -
+          </button>
+          <span className="zoom-level">{Math.round(zoom * 100)}%</span>
+          <button type="button" className="icon-button" onClick={() => onZoom(Math.min(20, zoom + 1))} aria-label="Zoom in">
+            +
+          </button>
+          <button
+            type="button"
+            className="icon-button expand-button"
+            onClick={() => document.documentElement.requestFullscreen?.()}
+            aria-label="Expand"
+          >
+            {"\u2922"}
+          </button>
+        </div>
+      </div>
+
       <div id="display" className="waveform-display" ref={displayRef}>
         {sourceType === "youtube" && youtubeVideoId && (
           <YouTubePlayer onPlayerReady={onYouTubePlayerReady} videoId={youtubeVideoId} />
@@ -74,18 +99,10 @@ export default function Player(props) {
           onSeek={ratio => onSeek(ratio * duration)}
           onSetSelection={onSetSelection}
           position={position}
+          positionLabel={currentTimeLabel}
           selection={selection}
           width={width}
         />
-      </div>
-
-      <div className="zoom-controls" aria-label="Waveform zoom">
-        <button type="button" className="icon-button" onClick={() => onZoom(Math.min(20, zoom + 1))} aria-label="Zoom in">
-          +
-        </button>
-        <button type="button" className="icon-button" onClick={() => onZoom(Math.max(1, zoom - 1))} aria-label="Zoom out">
-          -
-        </button>
       </div>
 
       <div id="toolbar" className="control-deck">
@@ -94,6 +111,7 @@ export default function Player(props) {
           hasSelectionStart={selection.start != null}
           isPlaying={isPlaying}
           currentTimeLabel={currentTimeLabel}
+          durationLabel={durationLabel}
           onJumpToFileStart={onJumpToFileStart}
           onJumpToSelectionEnd={onJumpToSelectionEnd}
           onJumpToSelectionStart={onJumpToSelectionStart}

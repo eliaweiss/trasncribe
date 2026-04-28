@@ -8,27 +8,35 @@ function drawWaveform(canvas, audioBuffer) {
 
   if (!audioBuffer) return;
 
-  const data = audioBuffer.getChannelData(0);
-  const samplesPerPixel = Math.max(1, Math.floor(data.length / width));
-  const middle = height / 2;
-
   const waveGradient = context.createLinearGradient(0, 0, width, 0);
-  waveGradient.addColorStop(0, "#365f88");
-  waveGradient.addColorStop(0.55, "#596f78");
-  waveGradient.addColorStop(1, "#70a073");
+  waveGradient.addColorStop(0, "#8057ff");
+  waveGradient.addColorStop(0.52, "#5f7cff");
+  waveGradient.addColorStop(1, "#18d8ff");
   context.fillStyle = waveGradient;
-  for (let x = 0; x < width; x += 1) {
-    const start = x * samplesPerPixel;
-    let min = 1;
-    let max = -1;
-    for (let i = 0; i < samplesPerPixel; i += 1) {
-      const sample = data[start + i] || 0;
-      if (sample < min) min = sample;
-      if (sample > max) max = sample;
+
+  const channelCount = Math.min(2, audioBuffer.numberOfChannels || 1);
+  const gap = channelCount > 1 ? 10 : 0;
+  const channelHeight = (height - gap) / channelCount;
+
+  for (let channel = 0; channel < channelCount; channel += 1) {
+    const data = audioBuffer.getChannelData(channel);
+    const samplesPerPixel = Math.max(1, Math.floor(data.length / width));
+    const topOffset = channel * (channelHeight + gap);
+    const middle = topOffset + channelHeight / 2;
+
+    for (let x = 0; x < width; x += 1) {
+      const start = x * samplesPerPixel;
+      let min = 1;
+      let max = -1;
+      for (let i = 0; i < samplesPerPixel; i += 1) {
+        const sample = data[start + i] || 0;
+        if (sample < min) min = sample;
+        if (sample > max) max = sample;
+      }
+      const top = middle + min * (channelHeight / 2);
+      const bottom = middle + max * (channelHeight / 2);
+      context.fillRect(x, top, 1, Math.max(1, bottom - top));
     }
-    const top = middle + min * middle;
-    const bottom = middle + max * middle;
-    context.fillRect(x, top, 1, Math.max(1, bottom - top));
   }
 }
 

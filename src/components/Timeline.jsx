@@ -4,9 +4,9 @@ import WaveformCanvas from "./WaveformCanvas.jsx";
 import SelectionOverlay from "./SelectionOverlay.jsx";
 import MarkerOverlay from "./MarkerOverlay.jsx";
 
-const HEIGHT = 178;
+const HEIGHT = 190;
 
-export default function Timeline({ audioBuffer, duration, marks, onSeek, onSetSelection, position, selection, width }) {
+export default function Timeline({ audioBuffer, duration, marks, onSeek, onSetSelection, position, positionLabel, selection, width }) {
   const canvasRef = useRef(null);
 
   return (
@@ -15,7 +15,9 @@ export default function Timeline({ audioBuffer, duration, marks, onSeek, onSetSe
       <TimeTicks duration={duration} width={width} />
       <WaveformCanvas ref={canvasRef} audioBuffer={audioBuffer} height={HEIGHT - 18} width={width} />
       <div className="overlay" id="waveform-position" style={{ pointerEvents: "none", width }} height={HEIGHT}>
-        <div className="position-line" style={{ left: `${position * width}px` }} />
+        <div className="position-line" style={{ left: `${position * width}px` }}>
+          <span className="position-label">{positionLabel}</span>
+        </div>
       </div>
       <SelectionOverlay
         height={HEIGHT}
