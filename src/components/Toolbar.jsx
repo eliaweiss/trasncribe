@@ -1,5 +1,34 @@
 import React from "react";
 
+function Stepper({ disabled = false, label, max, min, onChange, step, value }) {
+  return (
+    <div style={{ marginRight: "1.75em", textAlign: "center" }}>
+      <div style={{ color: "#101633", fontSize: "1.2em", marginBottom: ".25em" }}>{label}</div>
+      <div className="btn-group">
+        <button
+          className="btn btn-default"
+          disabled={disabled || value <= min}
+          onClick={() => onChange(value - step)}
+          type="button"
+        >
+          -
+        </button>
+        <button className="btn btn-default" disabled type="button" style={{ minWidth: "3.5em" }}>
+          {value}
+        </button>
+        <button
+          className="btn btn-default"
+          disabled={disabled || value >= max}
+          onClick={() => onChange(value + step)}
+          type="button"
+        >
+          +
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function Toolbar(props) {
   const {
     hasSelectionEnd,
@@ -8,9 +37,18 @@ export default function Toolbar(props) {
     onJumpToSelectionEnd,
     onJumpToSelectionStart,
     onPlayPause,
+    onSetPitchCents,
     onSetTempo,
+    pitchCents,
+    sourceType,
     tempo,
   } = props;
+
+  const canShiftPitch = sourceType === "audio";
+  const octaves = Math.trunc(pitchCents / 1200);
+  const centsAfterOctaves = pitchCents - octaves * 1200;
+  const semitones = Math.trunc(centsAfterOctaves / 100);
+  const cents = centsAfterOctaves - semitones * 100;
 
   return (
     <div>
@@ -25,20 +63,42 @@ export default function Toolbar(props) {
         <button className="btn btn-default" disabled={!hasSelectionEnd} title="Hotkey: E. Jump to the end selection line" onClick={onJumpToSelectionEnd}>Selection <u>E</u>nd</button>
       </div>
 
-      <div className="group" style={{ display: "block" }}>
-        <span className="flashicon emboss" style={{ marginLeft: "-1em" }}>Slow</span>
-        <input
-          aria-label="Tempo"
-          id="tempo-slider"
-          max="200"
-          min="25"
-          onChange={event => onSetTempo(event.target.value)}
-          step="1"
-          type="range"
+      <div style={{ alignItems: "center", clear: "both", display: "flex", paddingTop: "1em" }}>
+        <Stepper
+          label="Speed"
+          max={200}
+          min={25}
+          onChange={onSetTempo}
+          step={5}
           value={tempo}
         />
-        <span className="flashicon emboss" style={{ marginRight: "-1em" }}>Fast</span>
-        <div style={{ paddingTop: ".25em" }}>{tempo}%</div>
+        <Stepper
+          disabled={!canShiftPitch}
+          label="Octaves"
+          max={2}
+          min={-2}
+          onChange={nextOctaves => onSetPitchCents(nextOctaves * 1200 + semitones * 100 + cents)}
+          step={1}
+          value={octaves}
+        />
+        <Stepper
+          disabled={!canShiftPitch}
+          label="Semitones"
+          max={11}
+          min={-11}
+          onChange={nextSemitones => onSetPitchCents(octaves * 1200 + nextSemitones * 100 + cents)}
+          step={1}
+          value={semitones}
+        />
+        <Stepper
+          disabled={!canShiftPitch}
+          label="Cents"
+          max={99}
+          min={-99}
+          onChange={nextCents => onSetPitchCents(octaves * 1200 + semitones * 100 + nextCents)}
+          step={1}
+          value={cents}
+        />
       </div>
     </div>
   );

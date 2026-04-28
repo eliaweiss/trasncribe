@@ -27,7 +27,7 @@ export default function App() {
 
     const decoded = await decodeAudioFile(file);
     const url = URL.createObjectURL(file);
-    player.load(url);
+    player.load(url, decoded);
     setAudioBuffer(decoded);
     setFileName(file.name.replace(/\.[^/.]+$/, ""));
     setSelection({ start: 0, end: null });
@@ -174,6 +174,7 @@ export default function App() {
             onJumpToSelectionEnd={jumpToSelectionEnd}
             onJumpToSelectionStart={jumpToSelectionStart}
             onPlayPause={player.playPause}
+            onSetPitchCents={player.setPitchCents}
             onSeek={player.seek}
             onSetSelection={setSelection}
             onSetTempo={player.setTempo}
@@ -181,6 +182,7 @@ export default function App() {
             onZoom={setZoom}
             selection={selection}
             sourceType={player.sourceType}
+            pitchCents={player.pitchCents}
             tempo={player.tempo}
             youtubeVideoId={player.youtubeVideoId}
             zoom={zoom}

@@ -16,12 +16,14 @@ export default function Player(props) {
     onJumpToSelectionEnd,
     onJumpToSelectionStart,
     onPlayPause,
+    onSetPitchCents,
     onSeek,
     onSetSelection,
     onSetTempo,
     onZoom,
     selection,
     sourceType,
+    pitchCents,
     tempo,
     youtubeVideoId,
     onYouTubePlayerReady,
@@ -95,7 +97,10 @@ export default function Player(props) {
           onJumpToSelectionEnd={onJumpToSelectionEnd}
           onJumpToSelectionStart={onJumpToSelectionStart}
           onPlayPause={onPlayPause}
+          onSetPitchCents={onSetPitchCents}
           onSetTempo={onSetTempo}
+          pitchCents={pitchCents}
+          sourceType={sourceType}
           tempo={tempo}
         />
       </div>
