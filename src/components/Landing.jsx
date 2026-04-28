@@ -25,7 +25,7 @@ export default function Landing({ onChooseAudio, onLoadYouTube }) {
         </div>
 
         <div className="start-options">
-          <article className="start-card upload-card">
+          <article className="start-card upload-card" onClick={onChooseAudio} role="button" tabIndex={0} onKeyDown={e => e.key === "Enter" && onChooseAudio()}>
             <div className="start-card-icon" aria-hidden="true">
               {"\u21e7"}
             </div>
@@ -33,8 +33,9 @@ export default function Landing({ onChooseAudio, onLoadYouTube }) {
             <p>Upload MP3, WAV, FLAC, M4A or other audio formats.</p>
             <button
               className="start-action primary-start-action"
-              onClick={onChooseAudio}
+              onClick={e => { e.stopPropagation(); onChooseAudio(); }}
               type="button"
+              tabIndex={-1}
             >
               Choose File
             </button>
@@ -44,7 +45,7 @@ export default function Landing({ onChooseAudio, onLoadYouTube }) {
             or
           </div>
 
-          <article className="start-card youtube-card">
+          <article className="start-card youtube-card" onClick={requestYouTubeLink} role="button" tabIndex={0} onKeyDown={e => e.key === "Enter" && requestYouTubeLink()}>
             <div className="start-card-icon" aria-hidden="true">
               {"\u25b6"}
             </div>
@@ -52,8 +53,9 @@ export default function Landing({ onChooseAudio, onLoadYouTube }) {
             <p>Paste a YouTube link to extract and transcribe the audio.</p>
             <button
               className="start-action youtube-start-action"
-              onClick={requestYouTubeLink}
+              onClick={e => { e.stopPropagation(); requestYouTubeLink(); }}
               type="button"
+              tabIndex={-1}
             >
               Enter YouTube Link
             </button>
