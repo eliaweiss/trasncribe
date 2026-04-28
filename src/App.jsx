@@ -96,6 +96,10 @@ export default function App() {
     }));
   }, [selection]);
 
+  const selectLoop = useCallback(loop => {
+    setSelection({ start: loop.position, end: loop.end });
+  }, []);
+
   const jumpToFileStart = useCallback(() => {
     if (!isLoaded) return;
     player.seek(0);
@@ -192,6 +196,7 @@ export default function App() {
             onAddLoop={saveLoopSelection}
             onAddMark={addMarker}
             onRemoveMark={removeMarker}
+            onSelectLoop={selectLoop}
           />
         </>
       )}
