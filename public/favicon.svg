@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <rect width="64" height="64" rx="14" fill="#0a0e26"/>
+  <defs>
+    <linearGradient id="wg" x1="4" x2="60" y1="0" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#8b5cff"/>
+      <stop offset="100%" stop-color="#23d6ff"/>
+    </linearGradient>
+  </defs>
+  <!--
+    Original path in viewBox 0 0 64 36:
+      M2 20h7l5-15 8 30 8-24 7 18 6-9h19
+    Scale x by 60/64?same, shift y by +14 to center 36px waveform in 64px square:
+      y_new = y_old + 14
+    Redrawn with absolute coords for clarity:
+  -->
+  <path
+    d="M2 34 H9 L14 19 L22 49 L30 25 L37 43 L43 34 H62"
+    fill="none"
+    stroke="url(#wg)"
+    stroke-width="4"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+</svg>
