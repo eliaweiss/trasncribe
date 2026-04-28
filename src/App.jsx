@@ -7,16 +7,114 @@ import { useAudioPlayer } from "./hooks/useAudioPlayer.js";
 import { decodeAudioFile } from "./utils/audioBuffer.js";
 import { getYouTubeVideoId } from "./utils/youtube.js";
 
+const DEFAULT_SETTINGS = {
+  marks: [],
+  pitchCents: 0,
+  selection: { start: 0, end: null },
+  tempo: 100,
+  zoom: 1,
+};
+const SETTINGS_STORAGE_PREFIX = "transcribe:source-settings:";
+
+function clampRatio(value, fallback = 0) {
+  const numberValue = Number(value);
+  if (!Number.isFinite(numberValue)) return fallback;
+  return Math.max(0, Math.min(1, numberValue));
+}
+
+function normalizeSelection(selection) {
+  if (!selection || typeof selection !== "object") return DEFAULT_SETTINGS.selection;
+  const start = clampRatio(selection.start, 0);
+  const end = selection.end == null ? null : clampRatio(selection.end, start);
+  return { start: end == null ? start : Math.min(start, end), end };
+}
+
+function normalizeMarks(marks) {
+  if (!Array.isArray(marks)) return DEFAULT_SETTINGS.marks;
+
+  return marks
+    .filter(mark => mark && typeof mark === "object")
+    .map(mark => {
+      if (mark.type === "loop") {
+        return {
+          id: mark.id || Date.now() + Math.random(),
+          type: "loop",
+          position: clampRatio(mark.position, 0),
+          end: clampRatio(mark.end, mark.position || 0),
+          label: "Loop",
+        };
+      }
+
+      return {
+        id: mark.id || Date.now() + Math.random(),
+        type: "mark",
+        position: clampRatio(mark.position, 0),
+        time: Math.max(0, Number(mark.time) || 0),
+        label: "Mark",
+      };
+    });
+}
+
+function normalizeSettings(settings) {
+  if (!settings || typeof settings !== "object") return DEFAULT_SETTINGS;
+
+  return {
+    marks: normalizeMarks(settings.marks),
+    pitchCents: Math.max(-2400, Math.min(2400, Math.round(Number(settings.pitchCents) || 0))),
+    selection: normalizeSelection(settings.selection),
+    tempo: Math.max(25, Math.min(200, Number(settings.tempo) || 100)),
+    zoom: Math.max(1, Math.min(20, Number(settings.zoom) || 1)),
+  };
+}
+
+function getStoredSettings(sourceKey) {
+  try {
+    const rawSettings = window.localStorage.getItem(`${SETTINGS_STORAGE_PREFIX}${sourceKey}`);
+    return normalizeSettings(rawSettings ? JSON.parse(rawSettings) : null);
+  } catch {
+    return DEFAULT_SETTINGS;
+  }
+}
+
+function saveStoredSettings(sourceKey, settings) {
+  try {
+    window.localStorage.setItem(`${SETTINGS_STORAGE_PREFIX}${sourceKey}`, JSON.stringify({
+      ...normalizeSettings(settings),
+      version: 1,
+    }));
+  } catch {
+    // Storage can fail in private mode or when quota is exhausted.
+  }
+}
+
+function getFileSourceKey(file) {
+  return `file:${file.name}:${file.size}:${file.lastModified}`;
+}
+
+function getYouTubeSourceKey(videoId) {
+  return `youtube:${videoId}`;
+}
+
 export default function App() {
   const fileInputRef = useRef(null);
   const [audioBuffer, setAudioBuffer] = useState(null);
   const [fileName, setFileName] = useState("");
   const [selection, setSelection] = useState({ start: 0, end: null });
   const [marks, setMarks] = useState([]);
+  const [sourceSettingsKey, setSourceSettingsKey] = useState("");
   const [zoom, setZoom] = useState(1);
   const player = useAudioPlayer();
 
   const isLoaded = Boolean(player.sourceUrl);
+
+  const applySettings = useCallback(settings => {
+    const normalizedSettings = normalizeSettings(settings);
+    setMarks(normalizedSettings.marks);
+    setSelection(normalizedSettings.selection);
+    setZoom(normalizedSettings.zoom);
+    player.setTempo(normalizedSettings.tempo);
+    player.setPitchCents(normalizedSettings.pitchCents);
+  }, [player]);
 
   const chooseAudio = useCallback(() => {
     fileInputRef.current?.click();
@@ -27,12 +125,13 @@ export default function App() {
 
     const decoded = await decodeAudioFile(file);
     const url = URL.createObjectURL(file);
+    const nextSourceSettingsKey = getFileSourceKey(file);
     player.load(url, decoded);
     setAudioBuffer(decoded);
     setFileName(file.name.replace(/\.[^/.]+$/, ""));
-    setSelection({ start: 0, end: null });
-    setMarks([]);
-  }, [player]);
+    setSourceSettingsKey(nextSourceSettingsKey);
+    applySettings(getStoredSettings(nextSourceSettingsKey));
+  }, [applySettings, player]);
 
   const loadYouTube = useCallback(url => {
     const videoId = getYouTubeVideoId(url);
@@ -44,9 +143,9 @@ export default function App() {
     player.loadYouTube(videoId);
     setAudioBuffer(null);
     setFileName("YouTube Video");
-    setSelection({ start: 0, end: null });
-    setMarks([]);
-  }, [player]);
+    setSourceSettingsKey(getYouTubeSourceKey(videoId));
+    applySettings(getStoredSettings(getYouTubeSourceKey(videoId)));
+  }, [applySettings, player]);
 
   const chooseYouTube = useCallback(() => {
     const url = window.prompt("Paste a YouTube URL");
@@ -158,6 +257,18 @@ export default function App() {
     const end = selection.end * player.duration;
     player.setLoopRange(end > start ? { start, end } : null);
   }, [player, selection.end, selection.start]);
+
+  useEffect(() => {
+    if (!isLoaded || !sourceSettingsKey) return;
+
+    saveStoredSettings(sourceSettingsKey, {
+      marks,
+      pitchCents: player.pitchCents,
+      selection,
+      tempo: player.tempo,
+      zoom,
+    });
+  }, [isLoaded, marks, player.pitchCents, player.tempo, selection, sourceSettingsKey, zoom]);
 
   const sortedMarks = useMemo(() => marks.slice().sort((a, b) => a.position - b.position), [marks]);
 
