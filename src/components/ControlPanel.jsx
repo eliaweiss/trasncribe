@@ -6,14 +6,15 @@ export default function ControlPanel({ duration, marks, onAddLoop, onAddMark, on
   const loops = marks.filter(mark => mark.type === "loop");
 
   return (
-    <div className="control-panel visible-audio-loaded" style={{ marginLeft: 0 }}>
-      <div className="btn-group">
-        <button className="btn btn-default btn-sm" title="You can also tap 'm' to add a mark" onClick={onAddMark}>Add Mark</button>
-        <button className="btn btn-default btn-sm" title="Save the current selection as a loop" onClick={onAddLoop}>Add Loop</button>
+    <aside className="control-panel panel-card visible-audio-loaded">
+      <h2>markers</h2>
+      <div className="marker-actions">
+        <button className="pill-button pill-button-primary" title="You can also tap 'm' to add a mark" onClick={onAddMark}>Add Mark</button>
+        <button className="soft-button marker-loop-button" title="Save the current selection as a loop" onClick={onAddLoop}>Add Loop</button>
       </div>
 
       {!visibleMarks.length && !loops.length && (
-        <p id="empty-mark-message" style={{ display: "block" }}>
+        <p id="empty-mark-message">
           Tap Add Mark while playing to label parts of the song.
         </p>
       )}
@@ -23,7 +24,7 @@ export default function ControlPanel({ duration, marks, onAddLoop, onAddMark, on
           <li key={mark.id} className="card" onClick={() => onSelectMark(mark)} style={{ cursor: "pointer" }}>
             <strong>Mark</strong> {formatTime(mark.time)}
             <button
-              className="btn btn-default btn-xs"
+              className="soft-button remove-mark-button"
               onClick={event => {
                 event.stopPropagation();
                 onRemoveMark(mark.id);
@@ -40,7 +41,7 @@ export default function ControlPanel({ duration, marks, onAddLoop, onAddMark, on
           <li key={loop.id} className="card" onClick={() => onSelectLoop(loop)} style={{ cursor: "pointer" }}>
             <strong>Loop</strong> {formatTime(loop.position * duration)} - {formatTime(loop.end * duration)}
             <button
-              className="btn btn-default btn-xs"
+              className="soft-button remove-mark-button"
               onClick={event => {
                 event.stopPropagation();
                 onRemoveMark(loop.id);
@@ -51,6 +52,6 @@ export default function ControlPanel({ duration, marks, onAddLoop, onAddMark, on
           </li>
         ))}
       </ul>
-    </div>
+    </aside>
   );
 }

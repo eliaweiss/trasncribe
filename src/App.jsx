@@ -280,41 +280,43 @@ export default function App() {
       {!isLoaded && <Landing onChooseAudio={chooseAudio} onLoadYouTube={loadYouTube} />}
 
       {isLoaded && (
-        <>
-          <Player
-            audioBuffer={audioBuffer}
-            currentTime={player.currentTime}
-            duration={player.duration}
-            fileName={fileName}
-            isPlaying={player.isPlaying}
-            marks={sortedMarks}
-            onJumpToFileStart={jumpToFileStart}
-            onJumpToSelectionEnd={jumpToSelectionEnd}
-            onJumpToSelectionStart={jumpToSelectionStart}
-            onPlayPause={player.playPause}
-            onSetPitchCents={player.setPitchCents}
-            onSeek={player.seek}
-            onSetSelection={setSelection}
-            onSetTempo={player.setTempo}
-            onYouTubePlayerReady={player.attachYouTubePlayer}
-            onZoom={setZoom}
-            selection={selection}
-            sourceType={player.sourceType}
-            pitchCents={player.pitchCents}
-            tempo={player.tempo}
-            youtubeVideoId={player.youtubeVideoId}
-            zoom={zoom}
-          />
-          <ControlPanel
-            duration={player.duration}
-            marks={sortedMarks}
-            onAddLoop={saveLoopSelection}
-            onAddMark={addMarker}
-            onRemoveMark={removeMarker}
-            onSelectLoop={selectLoop}
-            onSelectMark={selectMark}
-          />
-        </>
+        <main className="app-stage" aria-label="Music transcriber">
+          <section className="transcriber-surface">
+            <Player
+              audioBuffer={audioBuffer}
+              currentTime={player.currentTime}
+              duration={player.duration}
+              fileName={fileName}
+              isPlaying={player.isPlaying}
+              marks={sortedMarks}
+              onJumpToFileStart={jumpToFileStart}
+              onJumpToSelectionEnd={jumpToSelectionEnd}
+              onJumpToSelectionStart={jumpToSelectionStart}
+              onPlayPause={player.playPause}
+              onSetPitchCents={player.setPitchCents}
+              onSeek={player.seek}
+              onSetSelection={setSelection}
+              onSetTempo={player.setTempo}
+              onYouTubePlayerReady={player.attachYouTubePlayer}
+              onZoom={setZoom}
+              selection={selection}
+              sourceType={player.sourceType}
+              pitchCents={player.pitchCents}
+              tempo={player.tempo}
+              youtubeVideoId={player.youtubeVideoId}
+              zoom={zoom}
+            />
+            <ControlPanel
+              duration={player.duration}
+              marks={sortedMarks}
+              onAddLoop={saveLoopSelection}
+              onAddMark={addMarker}
+              onRemoveMark={removeMarker}
+              onSelectLoop={selectLoop}
+              onSelectMark={selectMark}
+            />
+          </section>
+        </main>
       )}
     </div>
   );

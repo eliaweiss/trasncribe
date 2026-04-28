@@ -3,8 +3,11 @@ import { formatTime } from "../utils/audioBuffer.js";
 
 export default function TimeTicks({ duration, width }) {
   const ticks = [];
-  const step = duration > 300 ? 10 : 2;
-  for (let time = step; time <= duration; time += step) {
+  const targetTickCount = Math.max(5, Math.floor(width / 150));
+  const rawStep = duration / targetTickCount;
+  const steps = [2, 5, 10, 15, 30, 60, 90, 120];
+  const step = steps.find(candidate => candidate >= rawStep) || 180;
+  for (let time = 0; time <= duration; time += step) {
     ticks.push(time);
   }
 

@@ -4,7 +4,7 @@ import WaveformCanvas from "./WaveformCanvas.jsx";
 import SelectionOverlay from "./SelectionOverlay.jsx";
 import MarkerOverlay from "./MarkerOverlay.jsx";
 
-const HEIGHT = 224;
+const HEIGHT = 178;
 
 export default function Timeline({ audioBuffer, duration, marks, onSeek, onSetSelection, position, selection, width }) {
   const canvasRef = useRef(null);

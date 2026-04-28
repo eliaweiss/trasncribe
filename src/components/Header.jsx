@@ -2,30 +2,20 @@ import React from "react";
 
 export default function Header({ onChooseAudio, onChooseYouTube }) {
   return (
-    <nav className="navbar navbar-default" role="navigation">
-      <div className="navbar-header">
-        <button type="button" className="navbar-toggle">
-          <span className="sr-only">Toggle navigation</span>
-          <span>Menu</span>
+    <header className="app-header">
+      <a className="app-title" href="#" onClick={event => event.preventDefault()}>
+        Music Transcriber
+      </a>
+      <div className="header-actions" aria-label="Load audio source">
+        <button type="button" className="pill-button pill-button-primary" onClick={onChooseAudio}>
+          <span aria-hidden="true">{"\u266b"}</span>
+          Choose Audio
         </button>
-        <a className="navbar-brand" href="#" onClick={event => event.preventDefault()}>
-          <img src="/Transcribe Music Online_files/logo-blueblock.png" alt="Transcribe Music Online" />
-        </a>
+        <button type="button" className="pill-button pill-button-secondary" onClick={onChooseYouTube}>
+          <span aria-hidden="true">{"\u25bb"}</span>
+          Choose YouTube
+        </button>
       </div>
-      <div className="collapse navbar-collapse navbar-ex1-collapse">
-        <ul className="nav navbar-nav navbar-right">
-          <li>
-            <a href="#" onClick={event => { event.preventDefault(); onChooseAudio(); }}>
-              Choose Audio
-            </a>
-          </li>
-          <li>
-            <a href="#" onClick={event => { event.preventDefault(); onChooseYouTube(); }}>
-              Choose YouTube
-            </a>
-          </li>
-        </ul>
-      </div>
-    </nav>
+    </header>
   );
 }

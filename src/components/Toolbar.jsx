@@ -20,20 +20,20 @@ function Stepper({ disabled = false, label, max, min, onChange, step, value }) {
   };
 
   return (
-    <div style={{ marginRight: "1.25em", textAlign: "center" }}>
-      <div style={{ color: "#101633", fontSize: "1.2em", marginBottom: ".25em" }}>{label}</div>
-      <div className="btn-group">
+    <div className="stepper">
+      <div className="stepper-label">{label}</div>
+      <div className="stepper-controls">
         <button
-          className="btn btn-default"
-          disabled={disabled || value <= min}
-          onClick={() => onChange(value - step)}
+          className="round-stepper"
+          disabled={disabled || value >= max}
+          onClick={() => onChange(value + step)}
           type="button"
         >
-          -
+          +
         </button>
         <input
           aria-label={label}
-          className="btn btn-default"
+          className="stepper-value"
           disabled={disabled}
           max={max}
           min={min}
@@ -45,41 +45,41 @@ function Stepper({ disabled = false, label, max, min, onChange, step, value }) {
             }
           }}
           step="1"
-          style={{ borderLeft: 0, borderRight: 0, cursor: "text", minWidth: "3.5em", width: "4.5em" }}
           type="number"
           value={draftValue}
         />
         <button
-          className="btn btn-default"
-          disabled={disabled || value >= max}
-          onClick={() => onChange(value + step)}
+          className="round-stepper"
+          disabled={disabled || value <= min}
+          onClick={() => onChange(value - step)}
           type="button"
         >
-          +
+          -
         </button>
       </div>
     </div>
   );
 }
 
-function ResetButton({ disabled = false, onClick }) {
+function ResetButton({ className = "", disabled = false, onClick }) {
   return (
     <button
-      className="btn btn-default"
+      className={`soft-button ${className}`}
       disabled={disabled}
       onClick={onClick}
-      style={{ alignSelf: "flex-end", marginBottom: 0 }}
       type="button"
     >
-      Reset
+      reset
     </button>
   );
 }
 
 export default function Toolbar(props) {
   const {
+    currentTimeLabel,
     hasSelectionEnd,
     hasSelectionStart,
+    isPlaying,
     onJumpToFileStart,
     onJumpToSelectionEnd,
     onJumpToSelectionStart,
@@ -98,31 +98,49 @@ export default function Toolbar(props) {
   const cents = centsAfterOctaves - semitones * 100;
 
   return (
-    <div>
-      <div className="btn-group pull-left" style={{ marginTop: ".5em" }}>
-        <button className="btn btn-default" title="Hotkey: space" onClick={onPlayPause}>Play/Pause</button>
-        <button type="button" className="btn btn-default dropdown-toggle" data-toggle="dropdown">Settings</button>
+    <>
+      <div className="transport-panel">
+        <div className="state-readout">
+          <span>{isPlaying ? "Playing" : "Pause"}</span>
+          <span>is_playing: {String(isPlaying)}</span>
+        </div>
+        <button className="play-button" title="Hotkey: space" onClick={onPlayPause} type="button">
+          <span className="play-icon" aria-hidden="true">||</span>
+          <span>{isPlaying ? "Pause" : "Pause"}</span>
+        </button>
+        <button type="button" className="settings-button" title="Settings">
+          <span aria-hidden="true">{"\u2699"}</span>
+          <span>settings</span>
+        </button>
+        <div className="time-badge">{currentTimeLabel}</div>
       </div>
 
-      <div className="btn-group pull-left" style={{ clear: "left", marginTop: ".25em" }}>
-        <button className="btn btn-default" title="Hotkey: F. Jump to the start of the file" onClick={onJumpToFileStart}><u>F</u>ile Start</button>
-        <button className="btn btn-default" disabled={!hasSelectionStart} title="Hotkey: S. Jump to the start selection line" onClick={onJumpToSelectionStart}><u>S</u>election Start</button>
-        <button className="btn btn-default" disabled={!hasSelectionEnd} title="Hotkey: E. Jump to the end selection line" onClick={onJumpToSelectionEnd}>Selection <u>E</u>nd</button>
+      <div className="panel-card selection-card">
+        <h2>selection_controls</h2>
+        <button className="text-row-button" title="Hotkey: F. Jump to the start of the file" onClick={onJumpToFileStart} type="button">
+          File Start
+        </button>
+        <button className="text-row-button" disabled={!hasSelectionStart} title="Hotkey: S. Jump to the start selection line" onClick={onJumpToSelectionStart} type="button">
+          Selection Start
+        </button>
+        <button className="text-row-button" disabled={!hasSelectionEnd} title="Hotkey: E. Jump to the end selection line" onClick={onJumpToSelectionEnd} type="button">
+          Selection End
+        </button>
       </div>
 
-      <div style={{ alignItems: "center", clear: "both", display: "flex", paddingTop: "1em" }}>
-        <Stepper
-          label="Speed"
-          max={200}
-          min={25}
-          onChange={onSetTempo}
-          step={5}
-          value={tempo}
-        />
-        <ResetButton disabled={tempo === 100} onClick={() => onSetTempo(100)} />
+      <div className="audio-title">audio_controls</div>
+
+      <div className="panel-card speed-card">
+        <div className="speed-label">Speed</div>
+        <div className="speed-value">{tempo}%</div>
+        <div className="speed-actions">
+          <button className="round-stepper" disabled={tempo >= 200} onClick={() => onSetTempo(tempo + 5)} type="button">+</button>
+          <button className="round-stepper" disabled={tempo <= 25} onClick={() => onSetTempo(tempo - 5)} type="button">-</button>
+          <ResetButton disabled={tempo === 100} onClick={() => onSetTempo(100)} />
+        </div>
       </div>
 
-      <div style={{ alignItems: "center", display: "flex", paddingTop: ".75em" }}>
+      <div className="panel-card pitch-card">
         <Stepper
           disabled={!canShiftPitch}
           label="Octaves"
@@ -150,8 +168,8 @@ export default function Toolbar(props) {
           step={1}
           value={cents}
         />
-        <ResetButton disabled={!canShiftPitch || pitchCents === 0} onClick={() => onSetPitchCents(0)} />
+        <ResetButton className="pitch-reset" disabled={!canShiftPitch || pitchCents === 0} onClick={() => onSetPitchCents(0)} />
       </div>
-    </div>
+    </>
   );
 }
