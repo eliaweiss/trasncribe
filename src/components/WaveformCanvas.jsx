@@ -8,35 +8,28 @@ function drawWaveform(canvas, audioBuffer) {
 
   if (!audioBuffer) return;
 
-  const waveGradient = context.createLinearGradient(0, 0, width, 0);
-  waveGradient.addColorStop(0, "#8057ff");
-  waveGradient.addColorStop(0.52, "#5f7cff");
-  waveGradient.addColorStop(1, "#18d8ff");
-  context.fillStyle = waveGradient;
+  const gradient = context.createLinearGradient(0, 0, width, 0);
+  gradient.addColorStop(0, "#a875ff");
+  gradient.addColorStop(0.45, "#7c5cff");
+  gradient.addColorStop(0.65, "#4f7cff");
+  gradient.addColorStop(1, "#23d6ff");
+  context.fillStyle = gradient;
 
-  const channelCount = Math.min(2, audioBuffer.numberOfChannels || 1);
-  const gap = channelCount > 1 ? 10 : 0;
-  const channelHeight = (height - gap) / channelCount;
+  const data = audioBuffer.getChannelData(0);
+  const middle = height / 2;
+  const samplesPerPixel = Math.max(1, Math.floor(data.length / width));
+  const minBarHeight = 1;
 
-  for (let channel = 0; channel < channelCount; channel += 1) {
-    const data = audioBuffer.getChannelData(channel);
-    const samplesPerPixel = Math.max(1, Math.floor(data.length / width));
-    const topOffset = channel * (channelHeight + gap);
-    const middle = topOffset + channelHeight / 2;
-
-    for (let x = 0; x < width; x += 1) {
-      const start = x * samplesPerPixel;
-      let min = 1;
-      let max = -1;
-      for (let i = 0; i < samplesPerPixel; i += 1) {
-        const sample = data[start + i] || 0;
-        if (sample < min) min = sample;
-        if (sample > max) max = sample;
-      }
-      const top = middle + min * (channelHeight / 2);
-      const bottom = middle + max * (channelHeight / 2);
-      context.fillRect(x, top, 1, Math.max(1, bottom - top));
+  for (let x = 0; x < width; x += 1) {
+    const start = x * samplesPerPixel;
+    let peak = 0;
+    for (let i = 0; i < samplesPerPixel; i += 1) {
+      const sample = Math.abs(data[start + i] || 0);
+      if (sample > peak) peak = sample;
     }
+
+    const amplitude = Math.max(minBarHeight, peak * (height / 2) * 0.96);
+    context.fillRect(x, middle - amplitude, 1, amplitude * 2);
   }
 }
 
@@ -45,7 +38,16 @@ const WaveformCanvas = forwardRef(function WaveformCanvas({ audioBuffer, height,
     if (ref.current) drawWaveform(ref.current, audioBuffer);
   }, [audioBuffer, ref, width]);
 
-  return <canvas ref={ref} width={width} height={height} className="overlay" id="waveform-data" style={{ top: 34, bottom: 18 }} />;
+  return (
+    <canvas
+      ref={ref}
+      width={width}
+      height={height}
+      className="overlay"
+      id="waveform-data"
+      style={{ top: 18, bottom: 28 }}
+    />
+  );
 });
 
 export default WaveformCanvas;

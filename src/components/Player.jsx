@@ -1,8 +1,9 @@
 import React, { useLayoutEffect, useMemo, useRef } from "react";
 import { formatPreciseTime } from "../utils/audioBuffer.js";
 import Timeline from "./Timeline.jsx";
-import Toolbar from "./Toolbar.jsx";
+import Transport from "./Transport.jsx";
 import YouTubePlayer from "./YouTubePlayer.jsx";
+import { ExpandIcon, MinusIcon, MusicNoteIcon, PlusIcon } from "./Icons.jsx";
 
 export default function Player(props) {
   const {
@@ -16,15 +17,11 @@ export default function Player(props) {
     onJumpToSelectionEnd,
     onJumpToSelectionStart,
     onPlayPause,
-    onSetPitchCents,
     onSeek,
     onSetSelection,
-    onSetTempo,
     onZoom,
     selection,
     sourceType,
-    pitchCents,
-    tempo,
     youtubeVideoId,
     onYouTubePlayerReady,
     zoom,
@@ -61,29 +58,39 @@ export default function Player(props) {
   }, [position, width, zoom]);
 
   return (
-    <div id="player" className="player-panel visible-audio-loaded">
-      <div className="track-title">{fileName || "Audio File"}</div>
-
+    <section className="player-panel panel-card" aria-label="Waveform player">
       <div className="waveform-topbar">
         <div className="track-meta">
-          <span className="track-icon" aria-hidden="true">{"\u266b"}</span>
-          <span>{fileName || "Audio File"}</span>
+          <span className="track-icon" aria-hidden="true">
+            <MusicNoteIcon size={14} />
+          </span>
+          <span className="track-name">{fileName || "Audio File"}</span>
         </div>
         <div className="zoom-controls" aria-label="Waveform zoom">
-          <button type="button" className="icon-button" onClick={() => onZoom(Math.max(1, zoom - 1))} aria-label="Zoom out">
-            -
+          <button
+            type="button"
+            className="zoom-button"
+            onClick={() => onZoom(Math.max(1, zoom - 1))}
+            aria-label="Zoom out"
+          >
+            <MinusIcon size={14} />
           </button>
           <span className="zoom-level">{Math.round(zoom * 100)}%</span>
-          <button type="button" className="icon-button" onClick={() => onZoom(Math.min(20, zoom + 1))} aria-label="Zoom in">
-            +
+          <button
+            type="button"
+            className="zoom-button"
+            onClick={() => onZoom(Math.min(20, zoom + 1))}
+            aria-label="Zoom in"
+          >
+            <PlusIcon size={14} />
           </button>
           <button
             type="button"
-            className="icon-button expand-button"
+            className="zoom-button expand-button"
             onClick={() => document.documentElement.requestFullscreen?.()}
             aria-label="Expand"
           >
-            {"\u2922"}
+            <ExpandIcon size={14} />
           </button>
         </div>
       </div>
@@ -105,24 +112,17 @@ export default function Player(props) {
         />
       </div>
 
-      <div id="toolbar" className="control-deck">
-        <Toolbar
-          hasSelectionEnd={selection.end != null}
-          hasSelectionStart={selection.start != null}
-          isPlaying={isPlaying}
-          currentTimeLabel={currentTimeLabel}
-          durationLabel={durationLabel}
-          onJumpToFileStart={onJumpToFileStart}
-          onJumpToSelectionEnd={onJumpToSelectionEnd}
-          onJumpToSelectionStart={onJumpToSelectionStart}
-          onPlayPause={onPlayPause}
-          onSetPitchCents={onSetPitchCents}
-          onSetTempo={onSetTempo}
-          pitchCents={pitchCents}
-          sourceType={sourceType}
-          tempo={tempo}
-        />
-      </div>
-    </div>
+      <Transport
+        currentTimeLabel={currentTimeLabel}
+        durationLabel={durationLabel}
+        hasSelectionEnd={selection.end != null}
+        hasSelectionStart={selection.start != null}
+        isPlaying={isPlaying}
+        onJumpToFileStart={onJumpToFileStart}
+        onJumpToSelectionEnd={onJumpToSelectionEnd}
+        onJumpToSelectionStart={onJumpToSelectionStart}
+        onPlayPause={onPlayPause}
+      />
+    </section>
   );
 }

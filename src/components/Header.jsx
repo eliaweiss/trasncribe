@@ -1,5 +1,6 @@
 import React from "react";
 import WaveformLogo from "./WaveformLogo.jsx";
+import { UploadIcon, YouTubeIcon } from "./Icons.jsx";
 
 export default function Header({ onChooseAudio, onChooseYouTube }) {
   return (
@@ -10,11 +11,11 @@ export default function Header({ onChooseAudio, onChooseYouTube }) {
       </a>
       <div className="header-actions" aria-label="Load audio source">
         <button type="button" className="pill-button pill-button-primary" onClick={onChooseAudio}>
-          <span className="button-icon" aria-hidden="true">{"\u21e7"}</span>
+          <UploadIcon size={16} />
           Choose Audio
         </button>
         <button type="button" className="pill-button pill-button-secondary" onClick={onChooseYouTube}>
-          <span className="button-icon youtube-icon" aria-hidden="true">{"\u25b6"}</span>
+          <YouTubeIcon size={18} />
           Choose YouTube
         </button>
       </div>

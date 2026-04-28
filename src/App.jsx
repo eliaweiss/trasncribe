@@ -2,6 +2,8 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import Header from "./components/Header.jsx";
 import Landing from "./components/Landing.jsx";
 import Player from "./components/Player.jsx";
+import SpeedControl from "./components/SpeedControl.jsx";
+import PitchControl from "./components/PitchControl.jsx";
 import ControlPanel from "./components/ControlPanel.jsx";
 import { useAudioPlayer } from "./hooks/useAudioPlayer.js";
 import { decodeAudioFile } from "./utils/audioBuffer.js";
@@ -281,7 +283,7 @@ export default function App() {
 
       {isLoaded && (
         <main className="app-stage" aria-label="Music transcriber">
-          <section className="transcriber-surface">
+          <div className="transcriber-surface">
             <Player
               audioBuffer={audioBuffer}
               currentTime={player.currentTime}
@@ -293,19 +295,26 @@ export default function App() {
               onJumpToSelectionEnd={jumpToSelectionEnd}
               onJumpToSelectionStart={jumpToSelectionStart}
               onPlayPause={player.playPause}
-              onSetPitchCents={player.setPitchCents}
               onSeek={player.seek}
               onSetSelection={setSelection}
-              onSetTempo={player.setTempo}
               onYouTubePlayerReady={player.attachYouTubePlayer}
               onZoom={setZoom}
               selection={selection}
               sourceType={player.sourceType}
-              pitchCents={player.pitchCents}
-              tempo={player.tempo}
               youtubeVideoId={player.youtubeVideoId}
               zoom={zoom}
             />
+            <div className="controls-row">
+              <SpeedControl
+                tempo={player.tempo}
+                onSetTempo={player.setTempo}
+              />
+              <PitchControl
+                pitchCents={player.pitchCents}
+                onSetPitchCents={player.setPitchCents}
+                sourceType={player.sourceType}
+              />
+            </div>
             <ControlPanel
               duration={player.duration}
               marks={sortedMarks}
@@ -315,7 +324,7 @@ export default function App() {
               onSelectLoop={selectLoop}
               onSelectMark={selectMark}
             />
-          </section>
+          </div>
         </main>
       )}
     </div>
