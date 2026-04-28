@@ -582,6 +582,28 @@ button {
   line-height: 1;
 }
 
+.speed-value-input {
+  background: transparent;
+  border: none;
+  caret-color: currentColor;
+  color: inherit;
+  font-family: inherit;
+  font-weight: inherit;
+  outline: none;
+  padding: 0;
+  text-align: right;
+  width: 3.2ch;
+}
+
+.speed-value-input::-webkit-inner-spin-button,
+.speed-value-input::-webkit-outer-spin-button {
+  display: none;
+}
+
+.speed-value-input:focus {
+  border-bottom: 1px solid rgba(139, 157, 255, 0.5);
+}
+
 .speed-value-unit {
   color: #ffffff;
   font-size: 1.1rem;
@@ -699,19 +721,39 @@ button {
   margin-bottom: 2px;
 }
 
-.pitch-stepper:nth-child(1) .pitch-stepper-value {
-  background: none;
-  color: #8b5cff;
-  -webkit-text-fill-color: #8b5cff;
+.pitch-stepper-input {
+  background: transparent;
+  border: none;
+  caret-color: currentColor;
+  font-family: inherit;
+  font-weight: inherit;
+  -webkit-text-fill-color: inherit;
+  outline: none;
+  padding: 0;
+  text-align: center;
+  width: 4ch;
 }
 
-.pitch-stepper:nth-child(2) .pitch-stepper-value {
+.pitch-stepper-input::-webkit-inner-spin-button,
+.pitch-stepper-input::-webkit-outer-spin-button {
+  display: none;
+}
+
+.pitch-stepper-input:focus {
+  border-bottom: 1px solid rgba(139, 157, 255, 0.5);
+}
+
+.pitch-stepper-input:disabled {
+  opacity: 0.4;
+}
+
+.pitch-stepper:nth-child(1) .pitch-stepper-value {
   background: none;
   color: #5f7cff;
   -webkit-text-fill-color: #5f7cff;
 }
 
-.pitch-stepper:nth-child(3) .pitch-stepper-value {
+.pitch-stepper:nth-child(2) .pitch-stepper-value {
   background: none;
   color: #23d6ff;
   -webkit-text-fill-color: #23d6ff;

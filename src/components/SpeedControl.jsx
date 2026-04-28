@@ -1,7 +1,25 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { ClockIcon, MinusIcon, PlusIcon, ResetIcon } from "./Icons.jsx";
 
 export default function SpeedControl({ tempo, onSetTempo }) {
+  const [draft, setDraft] = useState(String(tempo));
+  const [editing, setEditing] = useState(false);
+
+  useEffect(() => {
+    if (!editing) setDraft(String(tempo));
+  }, [tempo, editing]);
+
+  function commit() {
+    const num = parseInt(draft, 10);
+    onSetTempo(Number.isFinite(num) ? num : tempo);
+    setEditing(false);
+  }
+
+  function onKeyDown(event) {
+    if (event.key === "Enter") { commit(); event.target.blur(); }
+    if (event.key === "Escape") { setDraft(String(tempo)); setEditing(false); event.target.blur(); }
+  }
+
   return (
     <section className="panel-card speed-card" aria-label="Playback speed">
       <header className="panel-heading">
@@ -12,7 +30,19 @@ export default function SpeedControl({ tempo, onSetTempo }) {
       </header>
 
       <div className="speed-value">
-        <span className="speed-value-number">{tempo}</span>
+        <input
+          aria-label="Playback speed percentage"
+          className="speed-value-number speed-value-input"
+          inputMode="numeric"
+          max="200"
+          min="25"
+          onBlur={commit}
+          onChange={event => { setDraft(event.target.value); setEditing(true); }}
+          onFocus={event => event.target.select()}
+          onKeyDown={onKeyDown}
+          type="number"
+          value={draft}
+        />
         <span className="speed-value-unit">%</span>
       </div>
 
