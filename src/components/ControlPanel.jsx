@@ -1,7 +1,7 @@
 import React from "react";
 import { formatTime } from "../utils/audioBuffer.js";
 
-export default function ControlPanel({ duration, marks, onAddLoop, onAddMark, onRemoveMark, onSelectLoop }) {
+export default function ControlPanel({ duration, marks, onAddLoop, onAddMark, onRemoveMark, onSelectLoop, onSelectMark }) {
   const visibleMarks = marks.filter(mark => mark.type !== "loop");
   const loops = marks.filter(mark => mark.type === "loop");
 
@@ -20,9 +20,17 @@ export default function ControlPanel({ duration, marks, onAddLoop, onAddMark, on
 
       <ul className="cards">
         {visibleMarks.map(mark => (
-          <li key={mark.id} className="card">
+          <li key={mark.id} className="card" onClick={() => onSelectMark(mark)} style={{ cursor: "pointer" }}>
             <strong>Mark</strong> {formatTime(mark.time)}
-            <button className="btn btn-default btn-xs" onClick={() => onRemoveMark(mark.id)}>Remove</button>
+            <button
+              className="btn btn-default btn-xs"
+              onClick={event => {
+                event.stopPropagation();
+                onRemoveMark(mark.id);
+              }}
+            >
+              Remove
+            </button>
           </li>
         ))}
       </ul>

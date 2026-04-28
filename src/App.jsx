@@ -100,6 +100,10 @@ export default function App() {
     setSelection({ start: loop.position, end: loop.end });
   }, []);
 
+  const selectMark = useCallback(mark => {
+    player.seek(mark.time);
+  }, [player]);
+
   const jumpToFileStart = useCallback(() => {
     if (!isLoaded) return;
     player.seek(0);
@@ -197,6 +201,7 @@ export default function App() {
             onAddMark={addMarker}
             onRemoveMark={removeMarker}
             onSelectLoop={selectLoop}
+            onSelectMark={selectMark}
           />
         </>
       )}
