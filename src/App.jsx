@@ -58,14 +58,14 @@ export default function App() {
     event.target.value = "";
   }, [loadFile]);
 
-  const addMarker = useCallback(type => {
+  const addMarker = useCallback(() => {
     if (!isLoaded || !player.duration) return;
     setMarks(existing => existing.concat({
       id: Date.now() + Math.random(),
-      type,
+      type: "mark",
       position: player.currentTime / player.duration,
       time: player.currentTime,
-      label: type === "beat" ? "Beat" : "Mark",
+      label: "Mark",
     }));
   }, [isLoaded, player.currentTime, player.duration]);
 
@@ -75,8 +75,7 @@ export default function App() {
       const isTyping = target && ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName);
       if (isTyping || event.metaKey || event.ctrlKey || event.altKey) return;
 
-      if (event.key.toLowerCase() === "m") addMarker("mark");
-      if (event.key.toLowerCase() === "b") addMarker("beat");
+      if (event.key.toLowerCase() === "m") addMarker();
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
@@ -190,9 +189,8 @@ export default function App() {
           <ControlPanel
             duration={player.duration}
             marks={sortedMarks}
-            onAddBeat={() => addMarker("beat")}
             onAddLoop={saveLoopSelection}
-            onAddMark={() => addMarker("mark")}
+            onAddMark={addMarker}
             onRemoveMark={removeMarker}
           />
         </>
