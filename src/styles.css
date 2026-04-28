@@ -73,22 +73,16 @@ button {
   text-decoration: none;
 }
 
-.app-logo {
-  align-items: center;
-  display: inline-flex;
-  filter: drop-shadow(0 0 14px rgba(124, 83, 255, 0.72));
-  width: 44px;
-}
-
-.app-logo svg {
+.waveform-logo {
   fill: none;
   stroke-linecap: round;
   stroke-linejoin: round;
   stroke-width: 4;
 }
 
-.app-logo path {
-  stroke: url("#waveformLogoGradient");
+.app-logo {
+  filter: drop-shadow(0 0 14px rgba(124, 83, 255, 0.72));
+  width: 44px;
 }
 
 .header-actions,
@@ -651,18 +645,10 @@ button {
   margin-bottom: 8px;
 }
 
-.landing-wave svg {
-  fill: none;
+.landing-logo {
   filter: drop-shadow(0 0 18px rgba(124, 92, 255, 0.9));
   height: 54px;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  stroke-width: 4;
   width: 96px;
-}
-
-.landing-wave path {
-  stroke: url("#landingWaveformLogoGradient");
 }
 
 .landing-hero h1 {
