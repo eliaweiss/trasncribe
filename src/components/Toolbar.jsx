@@ -2,7 +2,7 @@ import React from "react";
 
 function Stepper({ disabled = false, label, max, min, onChange, step, value }) {
   return (
-    <div style={{ marginRight: "1.75em", textAlign: "center" }}>
+    <div style={{ marginRight: "1.25em", textAlign: "center" }}>
       <div style={{ color: "#101633", fontSize: "1.2em", marginBottom: ".25em" }}>{label}</div>
       <div className="btn-group">
         <button
@@ -26,6 +26,20 @@ function Stepper({ disabled = false, label, max, min, onChange, step, value }) {
         </button>
       </div>
     </div>
+  );
+}
+
+function ResetButton({ disabled = false, onClick }) {
+  return (
+    <button
+      className="btn btn-default"
+      disabled={disabled}
+      onClick={onClick}
+      style={{ alignSelf: "flex-end", marginBottom: 0 }}
+      type="button"
+    >
+      Reset
+    </button>
   );
 }
 
@@ -72,6 +86,10 @@ export default function Toolbar(props) {
           step={5}
           value={tempo}
         />
+        <ResetButton disabled={tempo === 100} onClick={() => onSetTempo(100)} />
+      </div>
+
+      <div style={{ alignItems: "center", display: "flex", paddingTop: ".75em" }}>
         <Stepper
           disabled={!canShiftPitch}
           label="Octaves"
@@ -99,6 +117,7 @@ export default function Toolbar(props) {
           step={1}
           value={cents}
         />
+        <ResetButton disabled={!canShiftPitch || pitchCents === 0} onClick={() => onSetPitchCents(0)} />
       </div>
     </div>
   );
