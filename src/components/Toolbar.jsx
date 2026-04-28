@@ -1,6 +1,24 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 function Stepper({ disabled = false, label, max, min, onChange, step, value }) {
+  const [draftValue, setDraftValue] = useState(String(value));
+
+  useEffect(() => {
+    setDraftValue(String(value));
+  }, [value]);
+
+  const commitValue = nextValue => {
+    const numberValue = Number(nextValue);
+    if (!Number.isFinite(numberValue)) {
+      setDraftValue(String(value));
+      return;
+    }
+
+    const clampedValue = Math.max(min, Math.min(max, Math.round(numberValue)));
+    setDraftValue(String(clampedValue));
+    onChange(clampedValue);
+  };
+
   return (
     <div style={{ marginRight: "1.25em", textAlign: "center" }}>
       <div style={{ color: "#101633", fontSize: "1.2em", marginBottom: ".25em" }}>{label}</div>
@@ -13,9 +31,24 @@ function Stepper({ disabled = false, label, max, min, onChange, step, value }) {
         >
           -
         </button>
-        <button className="btn btn-default" disabled type="button" style={{ minWidth: "3.5em" }}>
-          {value}
-        </button>
+        <input
+          aria-label={label}
+          className="btn btn-default"
+          disabled={disabled}
+          max={max}
+          min={min}
+          onBlur={() => commitValue(draftValue)}
+          onChange={event => setDraftValue(event.target.value)}
+          onKeyDown={event => {
+            if (event.key === "Enter") {
+              event.currentTarget.blur();
+            }
+          }}
+          step="1"
+          style={{ borderLeft: 0, borderRight: 0, cursor: "text", minWidth: "3.5em", width: "4.5em" }}
+          type="number"
+          value={draftValue}
+        />
         <button
           className="btn btn-default"
           disabled={disabled || value >= max}
