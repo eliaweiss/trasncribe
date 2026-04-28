@@ -83,7 +83,7 @@ button {
 
 .pill-button {
   align-items: center;
-  border-radius: 12px;
+  border-radius: 999px;
   color: #fff;
   cursor: pointer;
   display: inline-flex;
@@ -388,12 +388,12 @@ button {
 
 .play-button {
   align-items: center;
-  background: linear-gradient(140deg, #4ed5ff 0%, #7660ff 50%, #8c51ff 100%);
+  background: linear-gradient(135deg, #5b65ff 0%, #815cff 100%);
   border-radius: 999px;
   box-shadow:
     0 0 0 1px rgba(255, 255, 255, 0.08) inset,
     0 14px 36px rgba(108, 92, 255, 0.5),
-    0 0 28px rgba(78, 213, 255, 0.32);
+    0 0 28px rgba(91, 101, 255, 0.32);
   color: #fff;
   cursor: pointer;
   display: inline-flex;
@@ -408,7 +408,7 @@ button {
   box-shadow:
     0 0 0 1px rgba(255, 255, 255, 0.12) inset,
     0 16px 42px rgba(108, 92, 255, 0.6),
-    0 0 36px rgba(78, 213, 255, 0.4);
+    0 0 36px rgba(91, 101, 255, 0.4);
   transform: translateY(-1px);
 }
 
@@ -565,15 +565,16 @@ button {
 }
 
 .speed-value-unit {
-  color: rgba(216, 222, 246, 0.6);
-  font-size: 0.95rem;
+  color: #ffffff;
+  font-size: 1.4rem;
   font-weight: 500;
+  margin-left: 2px;
 }
 
 .speed-buttons {
-  display: grid;
+  display: flex;
   gap: 10px;
-  grid-template-columns: repeat(3, 1fr);
+  justify-content: center;
 }
 
 .speed-step-button {
@@ -586,6 +587,7 @@ button {
   display: inline-flex;
   height: 36px;
   justify-content: center;
+  width: 52px;
   transition: border-color 140ms ease, box-shadow 140ms ease, color 140ms ease;
 }
 
@@ -672,10 +674,6 @@ button {
 }
 
 .pitch-stepper-value {
-  background: linear-gradient(135deg, #b889ff 0%, #6e7cff 50%, #2edfff 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
   font-size: 2rem;
   font-weight: 700;
   letter-spacing: -0.02em;
@@ -683,10 +681,28 @@ button {
   margin-bottom: 2px;
 }
 
+.pitch-stepper:nth-child(1) .pitch-stepper-value {
+  background: none;
+  color: #8b5cff;
+  -webkit-text-fill-color: #8b5cff;
+}
+
+.pitch-stepper:nth-child(2) .pitch-stepper-value {
+  background: none;
+  color: #5f7cff;
+  -webkit-text-fill-color: #5f7cff;
+}
+
+.pitch-stepper:nth-child(3) .pitch-stepper-value {
+  background: none;
+  color: #23d6ff;
+  -webkit-text-fill-color: #23d6ff;
+}
+
 .pitch-stepper-buttons {
-  display: grid;
+  display: flex;
   gap: 8px;
-  grid-template-columns: 1fr 1fr;
+  justify-content: center;
 }
 
 .pitch-step-button {
@@ -699,6 +715,7 @@ button {
   display: inline-flex;
   height: 32px;
   justify-content: center;
+  width: 44px;
   transition: border-color 140ms ease, box-shadow 140ms ease, color 140ms ease;
 }
 
