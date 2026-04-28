@@ -1,6 +1,6 @@
 let sharedAudioContext;
 
-function getAudioContext() {
+export function getAudioContext() {
   if (!sharedAudioContext) {
     const AudioContextClass = window.AudioContext || window.webkitAudioContext;
     sharedAudioContext = new AudioContextClass();
