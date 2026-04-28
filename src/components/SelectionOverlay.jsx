@@ -12,13 +12,13 @@ function drawSelection(canvas, selection) {
   const startX = selection.start * width;
   const endX = selection.end == null ? null : selection.end * width;
 
-  context.fillStyle = "#5869FC";
+  context.fillStyle = "#7d5cff";
   context.fillRect(startX - 1, 0, 3, height);
 
   if (endX != null) {
-    context.fillStyle = "rgba(88, 105, 252, 0.12)";
+    context.fillStyle = "rgba(125, 92, 255, 0.16)";
     context.fillRect(startX, 0, endX - startX, height);
-    context.fillStyle = "#5869FC";
+    context.fillStyle = "#23d6ff";
     context.fillRect(endX - 1, 0, 3, height);
   }
 }

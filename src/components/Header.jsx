@@ -1,31 +1,36 @@
 import React from "react";
+import WaveformLogo from "./WaveformLogo.jsx";
+import { UploadIcon, YouTubeIcon } from "./Icons.jsx";
 
 export default function Header({ onChooseAudio, onChooseYouTube }) {
   return (
-    <nav className="navbar navbar-default" role="navigation">
-      <div className="navbar-header">
-        <button type="button" className="navbar-toggle">
-          <span className="sr-only">Toggle navigation</span>
-          <span>Menu</span>
+    <header className="app-header">
+      <a
+        className="app-title"
+        href="#"
+        onClick={(event) => event.preventDefault()}
+      >
+        <WaveformLogo className="app-logo" />
+        <span>Muse Transcribe</span>
+      </a>
+      <div className="header-actions" aria-label="Load audio source">
+        <button
+          type="button"
+          className="pill-button pill-button-primary"
+          onClick={onChooseAudio}
+        >
+          <UploadIcon size={16} />
+          Choose Audio
         </button>
-        <a className="navbar-brand" href="#" onClick={event => event.preventDefault()}>
-          <img src="/Transcribe Music Online_files/logo-blueblock.png" alt="Transcribe Music Online" />
-        </a>
+        <button
+          type="button"
+          className="pill-button pill-button-secondary"
+          onClick={onChooseYouTube}
+        >
+          <YouTubeIcon size={18} />
+          Choose YouTube
+        </button>
       </div>
-      <div className="collapse navbar-collapse navbar-ex1-collapse">
-        <ul className="nav navbar-nav navbar-right">
-          <li>
-            <a href="#" onClick={event => { event.preventDefault(); onChooseAudio(); }}>
-              Choose Audio
-            </a>
-          </li>
-          <li>
-            <a href="#" onClick={event => { event.preventDefault(); onChooseYouTube(); }}>
-              Choose YouTube
-            </a>
-          </li>
-        </ul>
-      </div>
-    </nav>
+    </header>
   );
 }

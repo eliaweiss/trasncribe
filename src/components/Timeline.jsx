@@ -4,21 +4,42 @@ import WaveformCanvas from "./WaveformCanvas.jsx";
 import SelectionOverlay from "./SelectionOverlay.jsx";
 import MarkerOverlay from "./MarkerOverlay.jsx";
 
-const HEIGHT = 224;
+const HEIGHT = 170;
+const WAVE_TOP = 20;
+const WAVE_BOTTOM = 28;
 
-export default function Timeline({ audioBuffer, duration, marks, onSeek, onSetSelection, position, selection, width }) {
+export default function Timeline({ audioBuffer, duration, marks, onSeek, onSetSelection, position, positionLabel, selection, width }) {
   const canvasRef = useRef(null);
+  const waveHeight = HEIGHT - WAVE_TOP - WAVE_BOTTOM;
 
   return (
     <div className="mouse-container" style={{ height: HEIGHT, position: "relative" }}>
-      <MarkerOverlay marks={marks} width={width} />
-      <TimeTicks duration={duration} width={width} />
-      <WaveformCanvas ref={canvasRef} audioBuffer={audioBuffer} height={HEIGHT - 18} width={width} />
-      <div className="overlay" id="waveform-position" style={{ pointerEvents: "none", width }} height={HEIGHT}>
-        <div className="position-line" style={{ left: `${position * width}px` }} />
+      <WaveformCanvas
+        ref={canvasRef}
+        audioBuffer={audioBuffer}
+        height={waveHeight}
+        width={width}
+      />
+      <MarkerOverlay marks={marks} width={width} height={HEIGHT - WAVE_BOTTOM} />
+      <div
+        className="overlay"
+        id="waveform-position"
+        style={{
+          height: HEIGHT - WAVE_BOTTOM,
+          left: 0,
+          pointerEvents: "none",
+          position: "absolute",
+          top: 0,
+          width,
+        }}
+      >
+        <div className="position-line" style={{ left: `${position * width}px` }}>
+          <span className="position-label">{positionLabel}</span>
+        </div>
       </div>
+      <TimeTicks duration={duration} width={width} />
       <SelectionOverlay
-        height={HEIGHT}
+        height={HEIGHT - WAVE_BOTTOM}
         onSeek={onSeek}
         selection={selection}
         setSelection={onSetSelection}

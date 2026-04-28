@@ -11,3 +11,6 @@ This is now a normal React source tree. The app is written with named components
 Development is served by Vite from `src/main.jsx`; there is no checked-in app bundle.
 Use `npm run dev` for local development and `npm run build` for a normal Vite
 production build in `dist/`.
+
+
+http://muse-transcribe.com/

@@ -1,8 +1,9 @@
 import React, { useLayoutEffect, useMemo, useRef } from "react";
 import { formatPreciseTime } from "../utils/audioBuffer.js";
 import Timeline from "./Timeline.jsx";
-import Toolbar from "./Toolbar.jsx";
+import Transport from "./Transport.jsx";
 import YouTubePlayer from "./YouTubePlayer.jsx";
+import { ExpandIcon, MinusIcon, MusicNoteIcon, PlusIcon } from "./Icons.jsx";
 
 export default function Player(props) {
   const {
@@ -16,15 +17,11 @@ export default function Player(props) {
     onJumpToSelectionEnd,
     onJumpToSelectionStart,
     onPlayPause,
-    onSetPitchCents,
     onSeek,
     onSetSelection,
-    onSetTempo,
     onZoom,
     selection,
     sourceType,
-    pitchCents,
-    tempo,
     youtubeVideoId,
     onYouTubePlayerReady,
     zoom,
@@ -34,6 +31,8 @@ export default function Player(props) {
   const previousZoomRef = useRef(zoom);
   const position = duration ? currentTime / duration : 0;
   const width = useMemo(() => Math.max(window.innerWidth * zoom, window.innerWidth), [zoom]);
+  const currentTimeLabel = formatPreciseTime(currentTime);
+  const durationLabel = formatPreciseTime(duration);
 
   useLayoutEffect(() => {
     const display = displayRef.current;
@@ -59,17 +58,44 @@ export default function Player(props) {
   }, [position, width, zoom]);
 
   return (
-    <div id="player" className="visible-audio-loaded" style={{ marginLeft: 0 }}>
-      <div className="inner-container">
-        <div className="btn-group btn-group-sm pull-right">
-          <button type="button" className="btn btn-default" onClick={() => onZoom(Math.max(1, zoom - 1))}>-</button>
-          <button type="button" className="btn btn-default">Zoom</button>
-          <button type="button" className="btn btn-default" onClick={() => onZoom(Math.min(20, zoom + 1))}>+</button>
+    <section className="player-panel panel-card" aria-label="Waveform player">
+      <div className="waveform-topbar">
+        <div className="track-meta">
+          <span className="track-icon" aria-hidden="true">
+            <MusicNoteIcon size={14} />
+          </span>
+          <span className="track-name">{fileName || "Audio File"}</span>
         </div>
-        <h1>{fileName || "Audio File"}</h1>
+        <div className="zoom-controls" aria-label="Waveform zoom">
+          <button
+            type="button"
+            className="zoom-button"
+            onClick={() => onZoom(Math.max(1, zoom - 1))}
+            aria-label="Zoom out"
+          >
+            <MinusIcon size={14} />
+          </button>
+          <span className="zoom-level">{Math.round(zoom * 100)}%</span>
+          <button
+            type="button"
+            className="zoom-button"
+            onClick={() => onZoom(Math.min(20, zoom + 1))}
+            aria-label="Zoom in"
+          >
+            <PlusIcon size={14} />
+          </button>
+          <button
+            type="button"
+            className="zoom-button expand-button"
+            onClick={() => document.documentElement.requestFullscreen?.()}
+            aria-label="Expand"
+          >
+            <ExpandIcon size={14} />
+          </button>
+        </div>
       </div>
 
-      <div id="display" ref={displayRef} style={{ overflowX: "auto" }}>
+      <div id="display" className="waveform-display" ref={displayRef}>
         {sourceType === "youtube" && youtubeVideoId && (
           <YouTubePlayer onPlayerReady={onYouTubePlayerReady} videoId={youtubeVideoId} />
         )}
@@ -80,30 +106,23 @@ export default function Player(props) {
           onSeek={ratio => onSeek(ratio * duration)}
           onSetSelection={onSetSelection}
           position={position}
+          positionLabel={currentTimeLabel}
           selection={selection}
           width={width}
         />
       </div>
 
-      <div id="toolbar" className="clear-group">
-        <div className="pull-right">
-          <div className="currentTime">{formatPreciseTime(currentTime)}</div>
-        </div>
-        <Toolbar
-          hasSelectionEnd={selection.end != null}
-          hasSelectionStart={selection.start != null}
-          isPlaying={isPlaying}
-          onJumpToFileStart={onJumpToFileStart}
-          onJumpToSelectionEnd={onJumpToSelectionEnd}
-          onJumpToSelectionStart={onJumpToSelectionStart}
-          onPlayPause={onPlayPause}
-          onSetPitchCents={onSetPitchCents}
-          onSetTempo={onSetTempo}
-          pitchCents={pitchCents}
-          sourceType={sourceType}
-          tempo={tempo}
-        />
-      </div>
-    </div>
+      <Transport
+        currentTimeLabel={currentTimeLabel}
+        durationLabel={durationLabel}
+        hasSelectionEnd={selection.end != null}
+        hasSelectionStart={selection.start != null}
+        isPlaying={isPlaying}
+        onJumpToFileStart={onJumpToFileStart}
+        onJumpToSelectionEnd={onJumpToSelectionEnd}
+        onJumpToSelectionStart={onJumpToSelectionStart}
+        onPlayPause={onPlayPause}
+      />
+    </section>
   );
 }
