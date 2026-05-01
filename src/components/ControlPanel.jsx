@@ -1,5 +1,5 @@
 import React from "react";
-import { formatTime } from "../utils/audioBuffer.js";
+import { formatTime, formatPreciseTime } from "../utils/audioBuffer.js";
 import { BookmarkIcon, LoopIcon } from "./Icons.jsx";
 
 export default function ControlPanel({ duration, marks, onAddLoop, onAddMark, onRemoveMark, onSelectLoop, onSelectMark }) {
@@ -78,7 +78,7 @@ export default function ControlPanel({ duration, marks, onAddLoop, onAddMark, on
                 >
                   <span className="card-label">
                     <LoopIcon size={12} />
-                    Loop {formatTime(loop.position * duration)} – {formatTime(loop.end * duration)}
+                    Loop {formatPreciseTime(loop.position * duration)} – {formatPreciseTime(loop.end * duration)}
                   </span>
                   <button
                     type="button"
