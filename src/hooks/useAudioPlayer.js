@@ -341,10 +341,27 @@ export function useAudioPlayer() {
         event.preventDefault();
         playFromStart();
       }
+
+      if (event.key === "ArrowLeft") {
+        event.preventDefault();
+        seek(currentTime - 5);
+      }
+      if (event.key === "ArrowRight") {
+        event.preventDefault();
+        seek(currentTime + 5);
+      }
+      if (event.key === "ArrowUp") {
+        event.preventDefault();
+        seek(currentTime + 10);
+      }
+      if (event.key === "ArrowDown") {
+        event.preventDefault();
+        seek(currentTime - 10);
+      }
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [playFromStart, playPause]);
+  }, [currentTime, playFromStart, playPause, seek]);
 
   return {
     currentTime,
