@@ -3,7 +3,7 @@ import { formatPreciseTime } from "../utils/audioBuffer.js";
 import Timeline from "./Timeline.jsx";
 import Transport from "./Transport.jsx";
 import YouTubePlayer from "./YouTubePlayer.jsx";
-import { ExpandIcon, MinusIcon, MusicNoteIcon, PlusIcon } from "./Icons.jsx";
+import { ExpandIcon, FitViewIcon, MinusIcon, MusicNoteIcon, PlusIcon } from "./Icons.jsx";
 
 export default function Player(props) {
   const {
@@ -83,6 +83,15 @@ export default function Player(props) {
             aria-label="Zoom in"
           >
             <PlusIcon size={14} />
+          </button>
+          <button
+            type="button"
+            className="zoom-button"
+            onClick={() => onZoom(1)}
+            aria-label="Fit entire track"
+            title="Fit entire track"
+          >
+            <FitViewIcon size={14} />
           </button>
           <button
             type="button"
