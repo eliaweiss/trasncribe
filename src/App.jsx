@@ -75,7 +75,7 @@ function normalizeSettings(settings) {
     ),
     selection: normalizeSelection(settings.selection),
     tempo: Math.max(25, Math.min(200, Number(settings.tempo) || 100)),
-    zoom: Math.max(1, Math.min(20, Number(settings.zoom) || 1)),
+    zoom: Math.max(0.1, Math.min(20, Number(settings.zoom) || 1)),
   };
 }
 

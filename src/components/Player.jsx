@@ -30,7 +30,7 @@ export default function Player(props) {
   const displayRef = useRef(null);
   const previousZoomRef = useRef(zoom);
   const position = duration ? currentTime / duration : 0;
-  const width = useMemo(() => Math.max(window.innerWidth * zoom, window.innerWidth), [zoom]);
+  const width = useMemo(() => window.innerWidth * zoom, [zoom]);
   const currentTimeLabel = formatPreciseTime(currentTime);
   const durationLabel = formatPreciseTime(duration);
 
@@ -70,7 +70,7 @@ export default function Player(props) {
           <button
             type="button"
             className="zoom-button"
-            onClick={() => onZoom(Math.max(1, zoom - 1))}
+            onClick={() => onZoom(Math.max(0.1, zoom - 1))}
             aria-label="Zoom out"
           >
             <MinusIcon size={14} />
@@ -87,7 +87,12 @@ export default function Player(props) {
           <button
             type="button"
             className="zoom-button"
-            onClick={() => onZoom(1)}
+            onClick={() => {
+              const container = displayRef.current;
+              if (container) {
+                onZoom(container.clientWidth / window.innerWidth);
+              }
+            }}
             aria-label="Fit entire track"
             title="Fit entire track"
           >
