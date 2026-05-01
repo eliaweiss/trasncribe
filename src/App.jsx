@@ -236,6 +236,7 @@ export default function App() {
   const selectMark = useCallback(
     (mark) => {
       player.seek(mark.time);
+      setSelection((prev) => ({ ...prev, start: mark.position }));
     },
     [player]
   );
