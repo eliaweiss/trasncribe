@@ -52,7 +52,7 @@ export default function SpeedControl({ tempo, onSetTempo }) {
           className="speed-step-button"
           aria-label="Decrease speed"
           disabled={tempo <= 25}
-          onClick={() => onSetTempo(tempo - 5)}
+          onClick={() => { onSetTempo(tempo - 5); document.activeElement?.blur(); }}
         >
           <MinusIcon size={18} />
         </button>
@@ -61,7 +61,7 @@ export default function SpeedControl({ tempo, onSetTempo }) {
           className="speed-step-button"
           aria-label="Reset speed"
           disabled={tempo === 100}
-          onClick={() => onSetTempo(100)}
+          onClick={() => { onSetTempo(100); document.activeElement?.blur(); }}
         >
           <ResetIcon size={18} />
         </button>
@@ -70,7 +70,7 @@ export default function SpeedControl({ tempo, onSetTempo }) {
           className="speed-step-button"
           aria-label="Increase speed"
           disabled={tempo >= 200}
-          onClick={() => onSetTempo(tempo + 5)}
+          onClick={() => { onSetTempo(tempo + 5); document.activeElement?.blur(); }}
         >
           <PlusIcon size={18} />
         </button>
@@ -81,7 +81,9 @@ export default function SpeedControl({ tempo, onSetTempo }) {
         className="speed-slider"
         max="200"
         min="25"
-        onChange={event => onSetTempo(Number(event.target.value))}
+        onChange={event => { onSetTempo(Number(event.target.value)); }}
+        onMouseUp={event => event.target.blur()}
+        onTouchEnd={event => event.target.blur()}
         step="5"
         type="range"
         value={tempo}

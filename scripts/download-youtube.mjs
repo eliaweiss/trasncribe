@@ -2,7 +2,7 @@
 
 /* Usage: node scripts/download-youtube.mjs <youtube-url>
 // Example: 
-node scripts/download-youtube.mjs "https://youtu.be/5qbcYnzps8o?si=sIGosaawB3SGAoJx"
+node scripts/download-youtube.mjs "https://youtu.be/N2RNe2jwHE0?si=vxJjiTDdZCGGNu2_"
 transcript
 yt-dlp --write-auto-subs --skip-download "https://www.youtube.com/watch?v=h3ReF6WkYY8"
 */
