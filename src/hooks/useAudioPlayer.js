@@ -4,7 +4,7 @@ import { getAudioContext } from "../utils/audioBuffer.js";
 
 const SOUND_TOUCH_BUFFER_SIZE = 4096;
 const COUNT_IN_BEATS = 4;
-const COUNT_IN_INTERVAL_MS = 500;
+const COUNT_IN_INTERVAL_MS = 1000;
 
 export function useAudioPlayer() {
   const audioRef = useRef(new Audio());
@@ -24,7 +24,11 @@ export function useAudioPlayer() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [pitchCents, setPitchCentsState] = useState(0);
   const [tempo, setTempoState] = useState(100);
-  const [countInEnabled, setCountInEnabled] = useState(false);
+  const [countInEnabled, setCountInEnabled] = useState(() => {
+    const stored = window.localStorage.getItem("transcribe:countInEnabled") === "1";
+    countInEnabledRef.current = stored;
+    return stored;
+  });
   const [countInBeat, setCountInBeat] = useState(0);
 
   const disconnectPitchShifter = useCallback(() => {
@@ -135,8 +139,10 @@ export function useAudioPlayer() {
 
   const toggleCountIn = useCallback(() => {
     setCountInEnabled(prev => {
-      countInEnabledRef.current = !prev;
-      return !prev;
+      const next = !prev;
+      countInEnabledRef.current = next;
+      window.localStorage.setItem("transcribe:countInEnabled", next ? "1" : "0");
+      return next;
     });
   }, []);
 
