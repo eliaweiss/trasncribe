@@ -5,7 +5,7 @@ import { getAudioContext } from "../utils/audioBuffer.js";
 const SOUND_TOUCH_BUFFER_SIZE = 4096;
 // SoundTouch consumes input samples ahead of what the audio hardware is actually playing.
 // This constant compensates for that processing latency so the position line stays in sync.
-const SOUND_TOUCH_LATENCY_S = 1.0;
+const SOUND_TOUCH_LATENCY_S = 0.5;
 const COUNT_IN_BEATS = 4;
 const COUNT_IN_INTERVAL_MS = 1000;
 
@@ -28,7 +28,8 @@ export function useAudioPlayer() {
   const [pitchCents, setPitchCentsState] = useState(0);
   const [tempo, setTempoState] = useState(100);
   const [countInEnabled, setCountInEnabled] = useState(() => {
-    const stored = window.localStorage.getItem("transcribe:countInEnabled") === "1";
+    const stored =
+      window.localStorage.getItem("transcribe:countInEnabled") === "1";
     countInEnabledRef.current = stored;
     return stored;
   });
@@ -57,38 +58,57 @@ export function useAudioPlayer() {
     pitchShifterConnectedRef.current = true;
   }, []);
 
-  const createPitchShifter = useCallback((audioBuffer, startTime = 0) => {
-    disconnectPitchShifter();
-
-    const shifter = new PitchShifter(getAudioContext(), audioBuffer, SOUND_TOUCH_BUFFER_SIZE, () => {
+  const createPitchShifter = useCallback(
+    (audioBuffer, startTime = 0) => {
       disconnectPitchShifter();
-      setCurrentTime(audioBuffer.duration);
-      setIsPlaying(false);
-    });
 
-    shifter.tempo = tempo / 100;
-    shifter.pitchSemitones = pitchCents / 100;
-    shifter.percentagePlayed = audioBuffer.duration ? startTime / audioBuffer.duration : 0;
-    shifter.on("play", detail => {
-      const nextTime = detail.timePlayed || 0;
-      const loopRange = loopRangeRef.current;
+      const shifter = new PitchShifter(
+        getAudioContext(),
+        audioBuffer,
+        SOUND_TOUCH_BUFFER_SIZE,
+        () => {
+          disconnectPitchShifter();
+          setCurrentTime(audioBuffer.duration);
+          setIsPlaying(false);
+        }
+      );
 
-      if (loopRange && pitchShifterConnectedRef.current && nextTime >= loopRange.end) {
-        shifter.percentagePlayed = loopRange.start / audioBuffer.duration;
-        setCurrentTime(loopRange.start);
+      shifter.tempo = tempo / 100;
+      shifter.pitchSemitones = pitchCents / 100;
+      shifter.percentagePlayed = audioBuffer.duration
+        ? startTime / audioBuffer.duration
+        : 0;
+      shifter.on("play", (detail) => {
+        const nextTime = detail.timePlayed || 0;
+        const loopRange = loopRangeRef.current;
+
+        if (
+          loopRange &&
+          pitchShifterConnectedRef.current &&
+          nextTime >= loopRange.end
+        ) {
+          shifter.percentagePlayed = loopRange.start / audioBuffer.duration;
+          setCurrentTime(loopRange.start);
+          setDuration(audioBuffer.duration);
+          return;
+        }
+
+        setCurrentTime(
+          Math.max(
+            0,
+            Math.min(nextTime - SOUND_TOUCH_LATENCY_S, audioBuffer.duration)
+          )
+        );
         setDuration(audioBuffer.duration);
-        return;
-      }
+      });
 
-      setCurrentTime(Math.min(nextTime + SOUND_TOUCH_LATENCY_S, audioBuffer.duration));
+      pitchShifterRef.current = shifter;
+      pitchShifterConnectedRef.current = false;
       setDuration(audioBuffer.duration);
-    });
-
-    pitchShifterRef.current = shifter;
-    pitchShifterConnectedRef.current = false;
-    setDuration(audioBuffer.duration);
-    setCurrentTime(Math.min(startTime, audioBuffer.duration));
-  }, [disconnectPitchShifter, pitchCents, tempo]);
+      setCurrentTime(Math.min(startTime, audioBuffer.duration));
+    },
+    [disconnectPitchShifter, pitchCents, tempo]
+  );
 
   const syncTime = useCallback(() => {
     const audio = audioRef.current;
@@ -122,79 +142,96 @@ export function useAudioPlayer() {
     };
   }, [disconnectPitchShifter, syncTime]);
 
-  const setTempo = useCallback(nextTempo => {
+  const setTempo = useCallback((nextTempo) => {
     const clampedTempo = Math.max(25, Math.min(200, Number(nextTempo) || 100));
     setTempoState(clampedTempo);
     audioRef.current.playbackRate = clampedTempo / 100;
-    if (pitchShifterRef.current) pitchShifterRef.current.tempo = clampedTempo / 100;
+    if (pitchShifterRef.current)
+      pitchShifterRef.current.tempo = clampedTempo / 100;
     youtubePlayerRef.current?.setPlaybackRate?.(clampedTempo / 100);
   }, []);
 
-  const setPitchCents = useCallback(nextPitchCents => {
-    const clampedPitchCents = Math.max(-2400, Math.min(2400, Math.round(Number(nextPitchCents) || 0)));
+  const setPitchCents = useCallback((nextPitchCents) => {
+    const clampedPitchCents = Math.max(
+      -2400,
+      Math.min(2400, Math.round(Number(nextPitchCents) || 0))
+    );
     setPitchCentsState(clampedPitchCents);
-    if (pitchShifterRef.current) pitchShifterRef.current.pitchSemitones = clampedPitchCents / 100;
+    if (pitchShifterRef.current)
+      pitchShifterRef.current.pitchSemitones = clampedPitchCents / 100;
   }, []);
 
-  const setLoopRange = useCallback(range => {
+  const setLoopRange = useCallback((range) => {
     loopRangeRef.current = range;
   }, []);
 
   const toggleCountIn = useCallback(() => {
-    setCountInEnabled(prev => {
+    setCountInEnabled((prev) => {
       const next = !prev;
       countInEnabledRef.current = next;
-      window.localStorage.setItem("transcribe:countInEnabled", next ? "1" : "0");
+      window.localStorage.setItem(
+        "transcribe:countInEnabled",
+        next ? "1" : "0"
+      );
       return next;
     });
   }, []);
 
-  const load = useCallback((url, audioBuffer = null) => {
-    const audio = audioRef.current;
-    if (sourceUrl) URL.revokeObjectURL(sourceUrl);
-    youtubePlayerRef.current?.pauseVideo?.();
-    disconnectPitchShifter();
-    audio.pause();
-    if (audioBuffer) {
+  const load = useCallback(
+    (url, audioBuffer = null) => {
+      const audio = audioRef.current;
+      if (sourceUrl) URL.revokeObjectURL(sourceUrl);
+      youtubePlayerRef.current?.pauseVideo?.();
+      disconnectPitchShifter();
+      audio.pause();
+      if (audioBuffer) {
+        audio.removeAttribute("src");
+        createPitchShifter(audioBuffer);
+      } else {
+        audio.src = url;
+        audio.playbackRate = tempo / 100;
+      }
+      audio.currentTime = 0;
+      audio.volume = 1;
+      setSourceUrl(url);
+      setSourceType("audio");
+      setYoutubeVideoId("");
+      loopRangeRef.current = null;
+      setCurrentTime(0);
+      setDuration(audioBuffer?.duration || 0);
+      setIsPlaying(false);
+    },
+    [createPitchShifter, disconnectPitchShifter, sourceUrl, tempo]
+  );
+
+  const loadYouTube = useCallback(
+    (videoId) => {
+      const audio = audioRef.current;
+      if (sourceUrl) URL.revokeObjectURL(sourceUrl);
+      disconnectPitchShifter();
+      audio.pause();
       audio.removeAttribute("src");
-      createPitchShifter(audioBuffer);
-    } else {
-      audio.src = url;
-      audio.playbackRate = tempo / 100;
-    }
-    audio.currentTime = 0;
-    audio.volume = 1;
-    setSourceUrl(url);
-    setSourceType("audio");
-    setYoutubeVideoId("");
-    loopRangeRef.current = null;
-    setCurrentTime(0);
-    setDuration(audioBuffer?.duration || 0);
-    setIsPlaying(false);
-  }, [createPitchShifter, disconnectPitchShifter, sourceUrl, tempo]);
+      youtubePlayerRef.current?.pauseVideo?.();
+      setSourceUrl(`youtube:${videoId}`);
+      setSourceType("youtube");
+      setYoutubeVideoId(videoId);
+      loopRangeRef.current = null;
+      setCurrentTime(0);
+      setDuration(0);
+      setIsPlaying(false);
+    },
+    [disconnectPitchShifter, sourceUrl]
+  );
 
-  const loadYouTube = useCallback(videoId => {
-    const audio = audioRef.current;
-    if (sourceUrl) URL.revokeObjectURL(sourceUrl);
-    disconnectPitchShifter();
-    audio.pause();
-    audio.removeAttribute("src");
-    youtubePlayerRef.current?.pauseVideo?.();
-    setSourceUrl(`youtube:${videoId}`);
-    setSourceType("youtube");
-    setYoutubeVideoId(videoId);
-    loopRangeRef.current = null;
-    setCurrentTime(0);
-    setDuration(0);
-    setIsPlaying(false);
-  }, [disconnectPitchShifter, sourceUrl]);
-
-  const attachYouTubePlayer = useCallback(player => {
-    youtubePlayerRef.current = player;
-    player.setPlaybackRate?.(tempo / 100);
-    setDuration(player.getDuration?.() || 0);
-    setCurrentTime(player.getCurrentTime?.() || 0);
-  }, [tempo]);
+  const attachYouTubePlayer = useCallback(
+    (player) => {
+      youtubePlayerRef.current = player;
+      player.setPlaybackRate?.(tempo / 100);
+      setDuration(player.getDuration?.() || 0);
+      setCurrentTime(player.getCurrentTime?.() || 0);
+    },
+    [tempo]
+  );
 
   const playPause = useCallback(async () => {
     // Cancel an in-progress count-in
@@ -212,7 +249,8 @@ export function useAudioPlayer() {
     if (sourceType === "youtube") {
       const ytPlayer = youtubePlayerRef.current;
       if (!ytPlayer) return;
-      isPausing = ytPlayer.getPlayerState?.() === window.YT?.PlayerState?.PLAYING;
+      isPausing =
+        ytPlayer.getPlayerState?.() === window.YT?.PlayerState?.PLAYING;
     } else {
       const shifter = pitchShifterRef.current;
       if (shifter) {
@@ -275,7 +313,9 @@ export function useAudioPlayer() {
         osc.start();
         osc.stop(audioCtx.currentTime + 0.1);
 
-        await new Promise(resolve => setTimeout(resolve, COUNT_IN_INTERVAL_MS));
+        await new Promise((resolve) =>
+          setTimeout(resolve, COUNT_IN_INTERVAL_MS)
+        );
       }
 
       countInActiveRef.current = false;
@@ -288,7 +328,11 @@ export function useAudioPlayer() {
       const ytPlayer = youtubePlayerRef.current;
       if (!ytPlayer) return;
       const currentVideoTime = ytPlayer.getCurrentTime?.() || 0;
-      if (loopRange && (currentVideoTime < loopRange.start || currentVideoTime >= loopRange.end)) {
+      if (
+        loopRange &&
+        (currentVideoTime < loopRange.start ||
+          currentVideoTime >= loopRange.end)
+      ) {
         ytPlayer.seekTo(loopRange.start, true);
         setCurrentTime(loopRange.start);
       }
@@ -302,7 +346,11 @@ export function useAudioPlayer() {
     const shifter = pitchShifterRef.current;
 
     if (shifter) {
-      if (loopRange && (shifter.timePlayed < loopRange.start || shifter.timePlayed >= loopRange.end)) {
+      if (
+        loopRange &&
+        (shifter.timePlayed < loopRange.start ||
+          shifter.timePlayed >= loopRange.end)
+      ) {
         shifter.percentagePlayed = loopRange.start / duration;
         setCurrentTime(loopRange.start);
       }
@@ -312,7 +360,11 @@ export function useAudioPlayer() {
     }
 
     if (!audio.src) return;
-    if (loopRange && (audio.currentTime < loopRange.start || audio.currentTime >= loopRange.end)) {
+    if (
+      loopRange &&
+      (audio.currentTime < loopRange.start ||
+        audio.currentTime >= loopRange.end)
+    ) {
       audio.currentTime = loopRange.start;
       setCurrentTime(loopRange.start);
     }
@@ -320,7 +372,13 @@ export function useAudioPlayer() {
     audio.playbackRate = tempo / 100;
     await audio.play();
     setIsPlaying(true);
-  }, [connectPitchShifter, disconnectPitchShifter, duration, sourceType, tempo]);
+  }, [
+    connectPitchShifter,
+    disconnectPitchShifter,
+    duration,
+    sourceType,
+    tempo,
+  ]);
 
   const playFromStart = useCallback(async () => {
     if (sourceType === "youtube") {
@@ -354,35 +412,38 @@ export function useAudioPlayer() {
     setIsPlaying(true);
   }, [connectPitchShifter, sourceType, tempo]);
 
-  const seek = useCallback(seconds => {
-    if (sourceType === "youtube") {
-      const player = youtubePlayerRef.current;
-      if (!player || !Number.isFinite(seconds)) return;
-      const max = player.getDuration?.() || seconds;
-      const nextTime = Math.max(0, Math.min(seconds, max));
-      player.seekTo(nextTime, true);
-      setCurrentTime(nextTime);
-      setDuration(max);
-      return;
-    }
+  const seek = useCallback(
+    (seconds) => {
+      if (sourceType === "youtube") {
+        const player = youtubePlayerRef.current;
+        if (!player || !Number.isFinite(seconds)) return;
+        const max = player.getDuration?.() || seconds;
+        const nextTime = Math.max(0, Math.min(seconds, max));
+        player.seekTo(nextTime, true);
+        setCurrentTime(nextTime);
+        setDuration(max);
+        return;
+      }
 
-    const audio = audioRef.current;
-    if (!Number.isFinite(seconds)) return;
-    const shifter = pitchShifterRef.current;
+      const audio = audioRef.current;
+      if (!Number.isFinite(seconds)) return;
+      const shifter = pitchShifterRef.current;
 
-    if (shifter) {
-      const max = duration || shifter.duration || seconds;
-      const nextTime = Math.max(0, Math.min(seconds, max));
-      shifter.percentagePlayed = max ? nextTime / max : 0;
-      setCurrentTime(nextTime);
-      setDuration(max);
-      return;
-    }
+      if (shifter) {
+        const max = duration || shifter.duration || seconds;
+        const nextTime = Math.max(0, Math.min(seconds, max));
+        shifter.percentagePlayed = max ? nextTime / max : 0;
+        setCurrentTime(nextTime);
+        setDuration(max);
+        return;
+      }
 
-    const max = Number.isFinite(audio.duration) ? audio.duration : seconds;
-    audio.currentTime = Math.max(0, Math.min(seconds, max));
-    setCurrentTime(audio.currentTime || 0);
-  }, [duration, sourceType]);
+      const max = Number.isFinite(audio.duration) ? audio.duration : seconds;
+      audio.currentTime = Math.max(0, Math.min(seconds, max));
+      setCurrentTime(audio.currentTime || 0);
+    },
+    [duration, sourceType]
+  );
 
   useEffect(() => {
     if (sourceType !== "youtube") return undefined;
@@ -395,7 +456,11 @@ export function useAudioPlayer() {
       const nextTime = player.getCurrentTime?.() || 0;
       const loopRange = loopRangeRef.current;
 
-      if (loopRange && state === window.YT?.PlayerState?.PLAYING && nextTime >= loopRange.end) {
+      if (
+        loopRange &&
+        state === window.YT?.PlayerState?.PLAYING &&
+        nextTime >= loopRange.end
+      ) {
         player.seekTo(loopRange.start, true);
         setCurrentTime(loopRange.start);
         setDuration(nextDuration);
@@ -412,9 +477,10 @@ export function useAudioPlayer() {
   }, [sourceType]);
 
   useEffect(() => {
-    const onKeyDown = event => {
+    const onKeyDown = (event) => {
       const target = event.target;
-      const isTyping = target && ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName);
+      const isTyping =
+        target && ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName);
       if (isTyping) return;
 
       if (event.code === "Space") {
