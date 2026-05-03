@@ -1,0 +1,143 @@
+---
+alwaysApply: true
+---
+
+Here is an overview based on exploring `/Users/eliaweiss/work/trasncribe` (read-only).
+
+---
+
+## 1. Overall project structure
+
+```
+/Users/eliaweiss/work/trasncribe/
+├── package.json              # React + Vite; scripts: dev, build, extract:audio
+├── package-lock.json
+├── index.html                # SPA shell; title "Music Transcriber"
+├── README.md                 # Muse Transcribe product/docs
+├── .gitignore
+├── .vscode/settings.json
+├── public/
+│   └── favicon.svg
+├── scripts/
+│   ├── extract-audio.mjs      # ffmpeg: video → audio (MP3/WAV/etc.)
+│   └── download-youtube.mjs   # yt-dlp helper (git shows modified)
+└── src/
+    ├── main.jsx               # React mount
+    ├── App.jsx               # Routes state, persistence, shortcuts
+    ├── styles.css            # Global styles
+    ├── README.md             # Mirrors root structure docs
+    ├── hooks/
+    │   └── useAudioPlayer.js # Core playback logic
+    ├── utils/
+    │   ├── audioBuffer.js    # AudioContext + decode + time helpers
+    │   └── youtube.js        # URL parsing + iframe API loader
+    └── components/
+        ├── ControlPanel.jsx
+        ├── Header.jsx
+        ├── Icons.jsx
+        ├── Landing.jsx
+        ├── MarkerOverlay.jsx
+        ├── PitchControl.jsx
+        ├── Player.jsx
+        ├── SelectionOverlay.jsx
+        ├── SpeedControl.jsx
+        ├── TimeTicks.jsx
+        ├── Timeline.jsx
+        ├── Transport.jsx
+        ├── WaveformCanvas.jsx
+        ├── WaveformLogo.jsx
+        └── YouTubePlayer.jsx
+```
+
+There is no `vite.config.*` file; Vite relies on defaults (entry `index.html`, module `./src/main.jsx`).
+
+---
+
+## 2. What kind of app this is
+
+This is a **single-page browser web app**, not a Node server UI:
+
+- **Build**: [Vite](https://vitejs.dev/) (`npm run dev` on `127.0.0.1:8001`, `npm run build` → `dist/`).
+- **UI**: [React 19](https://react.dev/) mounting from `/Users/eliaweiss/work/trasncribe/src/main.jsx`.
+- **Auxiliary CLIs**: Node scripts under `/Users/eliaweiss/work/trasncribe/scripts/` (`extract-audio.mjs`, `download-youtube.mjs`) — developer utilities, not the main app bundle.
+
+Purpose (from README and code): **Muse Transcribe** — slow down / loop / mark audio for transcription; local files or YouTube.
+
+---
+
+## 3. Music / audio playback–related code
+
+| Area | Path | Role |
+|------|------|------|
+| **Hook / engine** | `/Users/eliaweiss/work/trasncribe/src/hooks/useAudioPlayer.js` | `HTMLAudioElement`, Web Audio gain, SoundTouchJS `PitchShifter` for decoded buffers, YouTube iframe player, tempo/pitch/loop/seek/play-pause |
+| **Decode / context** | `/Users/eliaweiss/work/trasncribe/src/utils/audioBuffer.js` | Singleton `AudioContext`, `decodeAudioFile`, `formatTime` / `formatPreciseTime` |
+| **Waveform** | `/Users/eliaweiss/work/trasncribe/src/components/WaveformCanvas.jsx` | Reads `audioBuffer.getChannelData(0)` and draws waveform on `<canvas>` |
+| **YouTube** | `/Users/eliaweiss/work/trasncribe/src/components/YouTubePlayer.jsx` | `YT.Player` embed; notifies parent via `onPlayerReady` |
+| **YouTube utils** | `/Users/eliaweiss/work/trasncribe/src/utils/youtube.js` | `getYouTubeVideoId`, async `loadYouTubeIframeApi` |
+| **App wiring** | `/Users/eliaweiss/work/trasncribe/src/App.jsx` | `decodeAudioFile` + `player.load(blobUrl, buffer)` vs `player.loadYouTube(id)`; selection → `player.setLoopRange` |
+| **Offline extract** | `/Users/eliaweiss/work/trasncribe/scripts/extract-audio.mjs` | `ffmpeg` to strip audio from video |
+
+**Important behavior distinctions** (from `useAudioPlayer.js`):
+
+- **Local files**: Decode to `AudioBuffer` → playback via SoundTouch pitch shifter (connect/disconnect toggles play for buffer path).
+- **YouTube**: No decoded buffer (`audioBuffer` is `null` in `App`); iframe player drives time; tempo via `setPlaybackRate`; pitch shifting is disabled in UI when `sourceType !== "audio"` (`PitchControl.jsx`).
+- Global **keyboard** handling in `useAudioPlayer`: Space play/pause, R restart, arrows seek ±5/10s (`useAudioPlayer.js` ~329–361). `App.jsx` adds `M`, `F`, `S`, `E` for markers and selection jumps.
+
+---
+
+## 4. UI components — buttons and playback controls
+
+Components live under `/Users/eliaweiss/work/trasncribe/src/components/`.
+
+**Playback / transport**
+
+- **`Transport.jsx`** — Primary playback UI: large **play/pause** (`PlayIcon` / `PauseIcon`), time badge, **File Start / Selection Start / Selection End** buttons, **settings** button (visual only — no handler wired in the snippet):
+
+```17:67:/Users/eliaweiss/work/trasncribe/src/components/Transport.jsx
+    <div className="transport-row">
+      <button
+        className="play-button"
+        title={isPlaying ? "Pause (space)" : "Play (space)"}
+        onClick={onPlayPause}
+        type="button"
+      >
+        {isPlaying ? <PauseIcon size={28} /> : <PlayIcon size={28} />}
+      </button>
+      ...
+      <button type="button" className="settings-button" title="Settings" aria-label="Settings">
+        <SettingsIcon size={20} />
+      </button>
+```
+
+- **`SpeedControl.jsx`** — Number input, **− / reset / +** tempo buttons, range slider (`aria-label="Playback speed"`).
+- **`PitchControl.jsx`** — Semitones/cents steppers with **− / +**, **Reset Pitch** (disabled when not local `audio`).
+- **`Player.jsx`** — **Zoom − / +**, **fit track**, **fullscreen**; wraps `Timeline` + `Transport`.
+- **`ControlPanel.jsx`** — **Add Mark**, **Add Loop**, per-item **Remove**, clickable cards for marks/loops.
+- **`Header.jsx`** — **Choose Audio**, **Choose YouTube**, GitHub link.
+- **`Landing.jsx`** — Card-style **`role="button"`** areas + nested **Choose File** / **Enter YouTube Link** buttons.
+
+**Non-button interaction**
+
+- **`Timeline.jsx`** + **`SelectionOverlay.jsx`** — drag selection on canvas overlay; **`MarkerOverlay.jsx`** — mark visualization.
+- **`TimeTicks.jsx`** — time ruler (no playback by itself).
+
+**Icons** — `/Users/eliaweiss/work/trasncribe/src/components/Icons.jsx` defines `PlayIcon`, `PauseIcon`, and controls icons used above.
+
+---
+
+## 5. Main entry points and key files
+
+| File | Responsibility |
+|------|----------------|
+| `/Users/eliaweiss/work/trasncribe/index.html` | Loads `/Users/eliaweiss/work/trasncribe/src/main.jsx` |
+| `/Users/eliaweiss/work/trasncribe/src/main.jsx` | `createRoot(...).render(<App />)` + `styles.css` |
+| `/Users/eliaweiss/work/trasncribe/src/App.jsx` | Source loading, persisted settings (`localStorage`), markers/loops/selection/zoom, composes **Player**, **SpeedControl**, **PitchControl**, **ControlPanel** |
+| `/Users/eliaweiss/work/trasncribe/src/hooks/useAudioPlayer.js` | Single source of truth for playback state and actions exposed to **App** |
+| `/Users/eliaweiss/work/trasncribe/src/components/Player.jsx` | Layout: waveform area, optional **YouTubePlayer**, **Timeline**, **Transport** |
+| `/Users/eliaweiss/work/trasncribe/package.json` | Dependencies: `react`, `react-dom`, `soundtouchjs`, `vite`; `dev` runs Vite |
+
+---
+
+### Summary
+
+The repo is a **Vite + React SPA** (“Muse Transcribe”) for **browser-based transcription practice**: waveform from **Web Audio–decoded** buffers, **SoundTouchJS** for time-stretch/pitch on files, **YouTube IFrame API** for video sources, plus **markers, loops, speed, zoom**, and **CLI helpers** (`scripts/`) outside the SPA. Playback controls concentrate in **`Transport.jsx`** (play/pause), **`SpeedControl.jsx`**, **`PitchControl.jsx`**, and keyboard logic in **`useAudioPlayer.js`**.
