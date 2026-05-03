@@ -3,6 +3,8 @@ import { PitchShifter } from "soundtouchjs";
 import { getAudioContext } from "../utils/audioBuffer.js";
 
 const SOUND_TOUCH_BUFFER_SIZE = 4096;
+const COUNT_IN_BEATS = 4;
+const COUNT_IN_INTERVAL_MS = 500;
 
 export function useAudioPlayer() {
   const audioRef = useRef(new Audio());
@@ -11,6 +13,9 @@ export function useAudioPlayer() {
   const pitchShifterRef = useRef(null);
   const pitchShifterConnectedRef = useRef(false);
   const youtubePlayerRef = useRef(null);
+  const countInActiveRef = useRef(false);
+  const countInCancelRef = useRef(false);
+  const countInEnabledRef = useRef(false);
   const [sourceUrl, setSourceUrl] = useState(null);
   const [sourceType, setSourceType] = useState(null);
   const [youtubeVideoId, setYoutubeVideoId] = useState("");
@@ -19,6 +24,8 @@ export function useAudioPlayer() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [pitchCents, setPitchCentsState] = useState(0);
   const [tempo, setTempoState] = useState(100);
+  const [countInEnabled, setCountInEnabled] = useState(false);
+  const [countInBeat, setCountInBeat] = useState(0);
 
   const disconnectPitchShifter = useCallback(() => {
     const shifter = pitchShifterRef.current;
@@ -126,6 +133,13 @@ export function useAudioPlayer() {
     loopRangeRef.current = range;
   }, []);
 
+  const toggleCountIn = useCallback(() => {
+    setCountInEnabled(prev => {
+      countInEnabledRef.current = !prev;
+      return !prev;
+    });
+  }, []);
+
   const load = useCallback((url, audioBuffer = null) => {
     const audio = audioRef.current;
     if (sourceUrl) URL.revokeObjectURL(sourceUrl);
@@ -174,25 +188,103 @@ export function useAudioPlayer() {
   }, [tempo]);
 
   const playPause = useCallback(async () => {
+    // Cancel an in-progress count-in
+    if (countInActiveRef.current) {
+      countInCancelRef.current = true;
+      countInActiveRef.current = false;
+      setCountInBeat(0);
+      return;
+    }
+
     const loopRange = loopRangeRef.current;
 
+    // Determine whether this action is a pause (vs. starting playback)
+    let isPausing = false;
     if (sourceType === "youtube") {
-      const player = youtubePlayerRef.current;
-      if (!player) return;
-      const playerState = player.getPlayerState?.();
-      if (playerState === window.YT?.PlayerState?.PLAYING) {
-        player.pauseVideo();
-        setCurrentTime(player.getCurrentTime?.() || 0);
-        setIsPlaying(false);
-        return;
+      const ytPlayer = youtubePlayerRef.current;
+      if (!ytPlayer) return;
+      isPausing = ytPlayer.getPlayerState?.() === window.YT?.PlayerState?.PLAYING;
+    } else {
+      const shifter = pitchShifterRef.current;
+      if (shifter) {
+        isPausing = pitchShifterConnectedRef.current;
+      } else {
+        const audio = audioRef.current;
+        if (!audio.src) return;
+        isPausing = !audio.paused;
       }
-      const currentVideoTime = player.getCurrentTime?.() || 0;
+    }
+
+    // Pause immediately — no count-in on pause
+    if (isPausing) {
+      if (sourceType === "youtube") {
+        const ytPlayer = youtubePlayerRef.current;
+        ytPlayer.pauseVideo();
+        setCurrentTime(ytPlayer.getCurrentTime?.() || 0);
+        setIsPlaying(false);
+      } else {
+        const shifter = pitchShifterRef.current;
+        if (shifter) {
+          disconnectPitchShifter();
+          setCurrentTime(shifter.timePlayed || 0);
+          setIsPlaying(false);
+        } else {
+          const audio = audioRef.current;
+          audio.pause();
+          setCurrentTime(audio.currentTime || 0);
+          setIsPlaying(false);
+        }
+      }
+      return;
+    }
+
+    // Run count-in before starting playback
+    if (countInEnabledRef.current) {
+      countInActiveRef.current = true;
+      countInCancelRef.current = false;
+
+      const audioCtx = getAudioContext();
+      await audioCtx.resume();
+
+      for (let i = 0; i < COUNT_IN_BEATS; i++) {
+        if (countInCancelRef.current) {
+          countInActiveRef.current = false;
+          setCountInBeat(0);
+          return;
+        }
+
+        setCountInBeat(i + 1);
+
+        const osc = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        osc.connect(g);
+        g.connect(audioCtx.destination);
+        osc.type = "sine";
+        osc.frequency.value = i === 0 ? 1000 : 750;
+        g.gain.setValueAtTime(0.4, audioCtx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.08);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.1);
+
+        await new Promise(resolve => setTimeout(resolve, COUNT_IN_INTERVAL_MS));
+      }
+
+      countInActiveRef.current = false;
+      setCountInBeat(0);
+      if (countInCancelRef.current) return;
+    }
+
+    // Start playback
+    if (sourceType === "youtube") {
+      const ytPlayer = youtubePlayerRef.current;
+      if (!ytPlayer) return;
+      const currentVideoTime = ytPlayer.getCurrentTime?.() || 0;
       if (loopRange && (currentVideoTime < loopRange.start || currentVideoTime >= loopRange.end)) {
-        player.seekTo(loopRange.start, true);
+        ytPlayer.seekTo(loopRange.start, true);
         setCurrentTime(loopRange.start);
       }
-      player.setPlaybackRate?.(tempo / 100);
-      player.playVideo();
+      ytPlayer.setPlaybackRate?.(tempo / 100);
+      ytPlayer.playVideo();
       setIsPlaying(true);
       return;
     }
@@ -201,40 +293,24 @@ export function useAudioPlayer() {
     const shifter = pitchShifterRef.current;
 
     if (shifter) {
-      if (pitchShifterConnectedRef.current) {
-        disconnectPitchShifter();
-        setCurrentTime(shifter.timePlayed || 0);
-        setIsPlaying(false);
-        return;
-      }
-
       if (loopRange && (shifter.timePlayed < loopRange.start || shifter.timePlayed >= loopRange.end)) {
         shifter.percentagePlayed = loopRange.start / duration;
         setCurrentTime(loopRange.start);
       }
-
       await connectPitchShifter();
       setIsPlaying(true);
       return;
     }
 
     if (!audio.src) return;
-
-    if (audio.paused) {
-      if (loopRange && (audio.currentTime < loopRange.start || audio.currentTime >= loopRange.end)) {
-        audio.currentTime = loopRange.start;
-        setCurrentTime(loopRange.start);
-      }
-      audio.volume = 1;
-      audio.playbackRate = tempo / 100;
-      await audio.play();
-      setIsPlaying(true);
-      return;
+    if (loopRange && (audio.currentTime < loopRange.start || audio.currentTime >= loopRange.end)) {
+      audio.currentTime = loopRange.start;
+      setCurrentTime(loopRange.start);
     }
-
-    audio.pause();
-    setCurrentTime(audio.currentTime || 0);
-    setIsPlaying(false);
+    audio.volume = 1;
+    audio.playbackRate = tempo / 100;
+    await audio.play();
+    setIsPlaying(true);
   }, [connectPitchShifter, disconnectPitchShifter, duration, sourceType, tempo]);
 
   const playFromStart = useCallback(async () => {
@@ -367,6 +443,8 @@ export function useAudioPlayer() {
     currentTime,
     duration,
     attachYouTubePlayer,
+    countInBeat,
+    countInEnabled,
     isPlaying,
     load,
     loadYouTube,
@@ -380,6 +458,7 @@ export function useAudioPlayer() {
     sourceType,
     pitchCents,
     tempo,
+    toggleCountIn,
     youtubeVideoId,
   };
 }

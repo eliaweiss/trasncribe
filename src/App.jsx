@@ -347,6 +347,8 @@ export default function App() {
           <div className="transcriber-surface">
             <Player
               audioBuffer={audioBuffer}
+              countInBeat={player.countInBeat}
+              countInEnabled={player.countInEnabled}
               currentTime={player.currentTime}
               duration={player.duration}
               fileName={fileName}
@@ -358,6 +360,7 @@ export default function App() {
               onPlayPause={player.playPause}
               onSeek={player.seek}
               onSetSelection={setSelection}
+              onToggleCountIn={player.toggleCountIn}
               onYouTubePlayerReady={player.attachYouTubePlayer}
               onZoom={setZoom}
               selection={selection}

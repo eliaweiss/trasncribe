@@ -8,6 +8,8 @@ import { ExpandIcon, FitViewIcon, MinusIcon, MusicNoteIcon, PlusIcon } from "./I
 export default function Player(props) {
   const {
     audioBuffer,
+    countInBeat,
+    countInEnabled,
     currentTime,
     duration,
     fileName,
@@ -19,6 +21,7 @@ export default function Player(props) {
     onPlayPause,
     onSeek,
     onSetSelection,
+    onToggleCountIn,
     onZoom,
     selection,
     sourceType,
@@ -127,6 +130,8 @@ export default function Player(props) {
       </div>
 
       <Transport
+        countInBeat={countInBeat}
+        countInEnabled={countInEnabled}
         currentTimeLabel={currentTimeLabel}
         durationLabel={durationLabel}
         hasSelectionEnd={selection.end != null}
@@ -136,6 +141,7 @@ export default function Player(props) {
         onJumpToSelectionEnd={onJumpToSelectionEnd}
         onJumpToSelectionStart={onJumpToSelectionStart}
         onPlayPause={onPlayPause}
+        onToggleCountIn={onToggleCountIn}
       />
     </section>
   );

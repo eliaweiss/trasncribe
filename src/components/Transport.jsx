@@ -3,6 +3,8 @@ import { PauseIcon, PlayIcon, SettingsIcon } from "./Icons.jsx";
 
 export default function Transport(props) {
   const {
+    countInBeat,
+    countInEnabled,
     currentTimeLabel,
     durationLabel,
     hasSelectionEnd,
@@ -12,18 +14,38 @@ export default function Transport(props) {
     onJumpToSelectionEnd,
     onJumpToSelectionStart,
     onPlayPause,
+    onToggleCountIn,
   } = props;
+
+  const isCountingIn = countInBeat > 0;
 
   return (
     <div className="transport-row">
-      <button
-        className="play-button"
-        title={isPlaying ? "Pause (space)" : "Play (space)"}
-        onClick={onPlayPause}
-        type="button"
-      >
-        {isPlaying ? <PauseIcon size={28} /> : <PlayIcon size={28} />}
-      </button>
+      <div className="play-group">
+        <button
+          className={`play-button${isCountingIn ? " play-button--counting" : ""}`}
+          title={isCountingIn ? "Cancel count-in" : isPlaying ? "Pause (space)" : "Play (space)"}
+          onClick={onPlayPause}
+          type="button"
+        >
+          {isCountingIn ? (
+            <span className="count-in-beat" key={countInBeat}>{countInBeat}</span>
+          ) : isPlaying ? (
+            <PauseIcon size={28} />
+          ) : (
+            <PlayIcon size={28} />
+          )}
+        </button>
+        <button
+          className={`count-in-toggle${countInEnabled ? " count-in-toggle--on" : ""}`}
+          onClick={onToggleCountIn}
+          title={countInEnabled ? "Count-in: ON — click to disable" : "Count-in: OFF — click to enable"}
+          type="button"
+          aria-pressed={countInEnabled}
+        >
+          1·2·3·4
+        </button>
+      </div>
 
       <div className="time-badge">
         <strong>{currentTimeLabel}</strong>
