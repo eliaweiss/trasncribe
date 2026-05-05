@@ -177,9 +177,18 @@ export function useAudioPlayer() {
     });
   }, []);
 
+  const cancelCountIn = useCallback(() => {
+    if (countInActiveRef.current) {
+      countInCancelRef.current = true;
+      countInActiveRef.current = false;
+      setCountInBeat(0);
+    }
+  }, []);
+
   const load = useCallback(
     (url, audioBuffer = null) => {
       const audio = audioRef.current;
+      cancelCountIn();
       if (sourceUrl) URL.revokeObjectURL(sourceUrl);
       youtubePlayerRef.current?.pauseVideo?.();
       disconnectPitchShifter();
@@ -201,12 +210,13 @@ export function useAudioPlayer() {
       setDuration(audioBuffer?.duration || 0);
       setIsPlaying(false);
     },
-    [createPitchShifter, disconnectPitchShifter, sourceUrl, tempo]
+    [cancelCountIn, createPitchShifter, disconnectPitchShifter, sourceUrl, tempo]
   );
 
   const loadYouTube = useCallback(
     (videoId) => {
       const audio = audioRef.current;
+      cancelCountIn();
       if (sourceUrl) URL.revokeObjectURL(sourceUrl);
       disconnectPitchShifter();
       audio.pause();
@@ -220,7 +230,7 @@ export function useAudioPlayer() {
       setDuration(0);
       setIsPlaying(false);
     },
-    [disconnectPitchShifter, sourceUrl]
+    [cancelCountIn, disconnectPitchShifter, sourceUrl]
   );
 
   const attachYouTubePlayer = useCallback(
