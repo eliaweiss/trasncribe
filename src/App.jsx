@@ -16,6 +16,7 @@ import { decodeAudioFile } from "./utils/audioBuffer.js";
 import { getYouTubeVideoId } from "./utils/youtube.js";
 
 const DEFAULT_SETTINGS = {
+  countInEnabled: false,
   marks: [],
   pitchCents: 0,
   selection: { start: 0, end: null },
@@ -68,6 +69,7 @@ function normalizeSettings(settings) {
   if (!settings || typeof settings !== "object") return DEFAULT_SETTINGS;
 
   return {
+    countInEnabled: Boolean(settings.countInEnabled),
     marks: normalizeMarks(settings.marks),
     pitchCents: Math.max(
       -2400,
@@ -132,6 +134,7 @@ export default function App() {
       setZoom(normalizedSettings.zoom);
       player.setTempo(normalizedSettings.tempo);
       player.setPitchCents(normalizedSettings.pitchCents);
+      player.setCountInEnabled(normalizedSettings.countInEnabled);
     },
     [player]
   );
@@ -304,6 +307,7 @@ export default function App() {
     if (!isLoaded || !sourceSettingsKey) return;
 
     saveStoredSettings(sourceSettingsKey, {
+      countInEnabled: player.countInEnabled,
       marks,
       pitchCents: player.pitchCents,
       selection,
@@ -313,6 +317,7 @@ export default function App() {
   }, [
     isLoaded,
     marks,
+    player.countInEnabled,
     player.pitchCents,
     player.tempo,
     selection,

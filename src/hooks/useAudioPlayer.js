@@ -27,12 +27,7 @@ export function useAudioPlayer() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [pitchCents, setPitchCentsState] = useState(0);
   const [tempo, setTempoState] = useState(100);
-  const [countInEnabled, setCountInEnabled] = useState(() => {
-    const stored =
-      window.localStorage.getItem("transcribe:countInEnabled") === "1";
-    countInEnabledRef.current = stored;
-    return stored;
-  });
+  const [countInEnabled, setCountInEnabledState] = useState(false);
   const [countInBeat, setCountInBeat] = useState(0);
 
   const disconnectPitchShifter = useCallback(() => {
@@ -165,17 +160,14 @@ export function useAudioPlayer() {
     loopRangeRef.current = range;
   }, []);
 
-  const toggleCountIn = useCallback(() => {
-    setCountInEnabled((prev) => {
-      const next = !prev;
-      countInEnabledRef.current = next;
-      window.localStorage.setItem(
-        "transcribe:countInEnabled",
-        next ? "1" : "0"
-      );
-      return next;
-    });
+  const setCountInEnabled = useCallback((value) => {
+    countInEnabledRef.current = value;
+    setCountInEnabledState(value);
   }, []);
+
+  const toggleCountIn = useCallback(() => {
+    setCountInEnabled(!countInEnabledRef.current);
+  }, [setCountInEnabled]);
 
   const cancelCountIn = useCallback(() => {
     if (countInActiveRef.current) {
@@ -531,6 +523,7 @@ export function useAudioPlayer() {
     countInBeat,
     countInEnabled,
     isPlaying,
+    setCountInEnabled,
     load,
     loadYouTube,
     playFromStart,
