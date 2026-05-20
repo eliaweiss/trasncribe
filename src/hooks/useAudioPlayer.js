@@ -11,6 +11,7 @@ const COUNT_IN_INTERVAL_MS = 1000;
 
 export function useAudioPlayer() {
   const audioRef = useRef(new Audio());
+  const audioBufferRef = useRef(null);
   const gainNodeRef = useRef(null);
   const loopRangeRef = useRef(null);
   const pitchShifterRef = useRef(null);
@@ -36,7 +37,8 @@ export function useAudioPlayer() {
     shifter.disconnect();
     pitchShifterConnectedRef.current = false;
     try {
-      shifter._filter._soundTouch.clear();
+      shifter._filter?.clear?.();
+      shifter._soundtouch?.clear?.();
     } catch {}
   }, []);
 
@@ -59,6 +61,7 @@ export function useAudioPlayer() {
   const createPitchShifter = useCallback(
     (audioBuffer, startTime = 0) => {
       disconnectPitchShifter();
+      audioBufferRef.current = audioBuffer;
 
       const shifter = new PitchShifter(
         getAudioContext(),
@@ -192,6 +195,7 @@ export function useAudioPlayer() {
         audio.removeAttribute("src");
         createPitchShifter(audioBuffer);
       } else {
+        audioBufferRef.current = null;
         audio.src = url;
         audio.playbackRate = tempo / 100;
       }
@@ -217,6 +221,7 @@ export function useAudioPlayer() {
       audio.pause();
       audio.removeAttribute("src");
       youtubePlayerRef.current?.pauseVideo?.();
+      audioBufferRef.current = null;
       setSourceUrl(`youtube:${videoId}`);
       setSourceType("youtube");
       setYoutubeVideoId(videoId);
@@ -277,8 +282,11 @@ export function useAudioPlayer() {
       } else {
         const shifter = pitchShifterRef.current;
         if (shifter) {
+          const pausedTime = Math.max(0, Math.min(shifter.timePlayed || 0, duration || shifter.duration || 0));
+          const buffer = audioBufferRef.current;
           disconnectPitchShifter();
-          setCurrentTime(shifter.timePlayed || 0);
+          if (buffer) createPitchShifter(buffer, pausedTime);
+          setCurrentTime(pausedTime);
           setIsPlaying(false);
         } else {
           const audio = audioRef.current;
