@@ -11,7 +11,6 @@ const COUNT_IN_INTERVAL_MS = 1000;
 
 export function useAudioPlayer() {
   const audioRef = useRef(new Audio());
-  const audioBufferRef = useRef(null);
   const gainNodeRef = useRef(null);
   const loopRangeRef = useRef(null);
   const pitchShifterRef = useRef(null);
@@ -36,6 +35,9 @@ export function useAudioPlayer() {
     if (!shifter || !pitchShifterConnectedRef.current) return;
     shifter.disconnect();
     pitchShifterConnectedRef.current = false;
+    try {
+      shifter._filter._soundTouch.clear();
+    } catch {}
   }, []);
 
   const connectPitchShifter = useCallback(async () => {
@@ -57,7 +59,6 @@ export function useAudioPlayer() {
   const createPitchShifter = useCallback(
     (audioBuffer, startTime = 0) => {
       disconnectPitchShifter();
-      audioBufferRef.current = audioBuffer;
 
       const shifter = new PitchShifter(
         getAudioContext(),
@@ -191,7 +192,6 @@ export function useAudioPlayer() {
         audio.removeAttribute("src");
         createPitchShifter(audioBuffer);
       } else {
-        audioBufferRef.current = null;
         audio.src = url;
         audio.playbackRate = tempo / 100;
       }
@@ -217,7 +217,6 @@ export function useAudioPlayer() {
       audio.pause();
       audio.removeAttribute("src");
       youtubePlayerRef.current?.pauseVideo?.();
-      audioBufferRef.current = null;
       setSourceUrl(`youtube:${videoId}`);
       setSourceType("youtube");
       setYoutubeVideoId(videoId);
@@ -352,17 +351,13 @@ export function useAudioPlayer() {
     const shifter = pitchShifterRef.current;
 
     if (shifter) {
-      const buffer = audioBufferRef.current;
-      const max = duration || (buffer ? buffer.duration : 0);
-      let startTime = max ? shifter.percentagePlayed * max : 0;
       if (
         loopRange &&
-        (startTime < loopRange.start || startTime >= loopRange.end)
+        (shifter.timePlayed < loopRange.start ||
+          shifter.timePlayed >= loopRange.end)
       ) {
-        startTime = loopRange.start;
-      }
-      if (buffer) {
-        createPitchShifter(buffer, startTime);
+        shifter.percentagePlayed = loopRange.start / duration;
+        setCurrentTime(loopRange.start);
       }
       await connectPitchShifter();
       setIsPlaying(true);
@@ -384,7 +379,6 @@ export function useAudioPlayer() {
     setIsPlaying(true);
   }, [
     connectPitchShifter,
-    createPitchShifter,
     disconnectPitchShifter,
     duration,
     sourceType,
@@ -407,12 +401,7 @@ export function useAudioPlayer() {
     const shifter = pitchShifterRef.current;
 
     if (shifter) {
-      const buffer = audioBufferRef.current;
-      if (buffer) {
-        createPitchShifter(buffer, 0);
-      } else {
-        shifter.percentagePlayed = 0;
-      }
+      shifter.percentagePlayed = 0;
       await connectPitchShifter();
       setCurrentTime(0);
       setIsPlaying(true);
@@ -426,7 +415,7 @@ export function useAudioPlayer() {
     await audio.play();
     setCurrentTime(0);
     setIsPlaying(true);
-  }, [connectPitchShifter, createPitchShifter, sourceType, tempo]);
+  }, [connectPitchShifter, sourceType, tempo]);
 
   const seek = useCallback(
     (seconds) => {
