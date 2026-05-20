@@ -387,6 +387,7 @@ export function useAudioPlayer() {
     setIsPlaying(true);
   }, [
     connectPitchShifter,
+    createPitchShifter,
     disconnectPitchShifter,
     duration,
     sourceType,
