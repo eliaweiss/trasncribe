@@ -85,12 +85,16 @@ export function useAudioPlayer() {
         : 0;
       shifter.on("play", (detail) => {
         const nextTime = detail.timePlayed || 0;
+        const audibleTime = Math.max(
+          0,
+          Math.min(nextTime - SOUND_TOUCH_LATENCY_S, audioBuffer.duration)
+        );
         const loopRange = loopRangeRef.current;
 
         if (
           loopRange &&
           pitchShifterConnectedRef.current &&
-          nextTime >= loopRange.end
+          audibleTime >= loopRange.end
         ) {
           shifter.percentagePlayed = loopRange.start / audioBuffer.duration;
           setCurrentTime(loopRange.start);
@@ -98,12 +102,7 @@ export function useAudioPlayer() {
           return;
         }
 
-        setCurrentTime(
-          Math.max(
-            0,
-            Math.min(nextTime - SOUND_TOUCH_LATENCY_S, audioBuffer.duration)
-          )
-        );
+        setCurrentTime(audibleTime);
         setDuration(audioBuffer.duration);
       });
 
