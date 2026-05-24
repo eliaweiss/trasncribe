@@ -36,6 +36,10 @@ export function useAudioPlayer() {
     if (!shifter || !pitchShifterConnectedRef.current) return;
     shifter.disconnect();
     pitchShifterConnectedRef.current = false;
+  }, []);
+
+  const clearPitchShifterBuffer = useCallback((shifter) => {
+    if (!shifter) return;
     try {
       shifter._filter?.clear?.();
       shifter._soundtouch?.clear?.();
@@ -285,6 +289,7 @@ export function useAudioPlayer() {
           const pausedTime = Math.max(0, Math.min(shifter.timePlayed || 0, duration || shifter.duration || 0));
           const buffer = audioBufferRef.current;
           disconnectPitchShifter();
+          clearPitchShifterBuffer(shifter);
           if (buffer) createPitchShifter(buffer, pausedTime);
           setCurrentTime(pausedTime);
           setIsPlaying(false);
@@ -386,6 +391,7 @@ export function useAudioPlayer() {
     await audio.play();
     setIsPlaying(true);
   }, [
+    clearPitchShifterBuffer,
     connectPitchShifter,
     createPitchShifter,
     disconnectPitchShifter,
