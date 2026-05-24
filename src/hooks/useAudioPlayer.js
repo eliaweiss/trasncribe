@@ -6,6 +6,7 @@ const SOUND_TOUCH_BUFFER_SIZE = 4096;
 // SoundTouch consumes input samples ahead of what the audio hardware is actually playing.
 // This constant compensates for that processing latency so the position line stays in sync.
 const SOUND_TOUCH_LATENCY_S = 0.5;
+const LOOP_END_COMPENSATION_S = 0.01;
 const COUNT_IN_BEATS = 4;
 const COUNT_IN_INTERVAL_MS = 1000;
 
@@ -94,7 +95,7 @@ export function useAudioPlayer() {
         if (
           loopRange &&
           pitchShifterConnectedRef.current &&
-          audibleTime >= loopRange.end
+          audibleTime >= loopRange.end - LOOP_END_COMPENSATION_S
         ) {
           shifter.percentagePlayed = loopRange.start / audioBuffer.duration;
           setCurrentTime(loopRange.start);
