@@ -24,6 +24,20 @@ const DEFAULT_SETTINGS = {
   zoom: 1,
 };
 const SETTINGS_STORAGE_PREFIX = "transcribe:source-settings:";
+const MARK_COLORS = [
+  "#ff6b9a",
+  "#f59e0b",
+  "#2dd4bf",
+  "#38bdf8",
+  "#a78bfa",
+  "#f472b6",
+  "#84cc16",
+  "#fb7185",
+  "#22c55e",
+  "#eab308",
+  "#60a5fa",
+  "#c084fc",
+];
 
 function clampRatio(value, fallback = 0) {
   const numberValue = Number(value);
@@ -44,7 +58,8 @@ function normalizeMarks(marks) {
 
   return marks
     .filter((mark) => mark && typeof mark === "object")
-    .map((mark) => {
+    .map((mark, index) => {
+      const color = mark.color || MARK_COLORS[index % MARK_COLORS.length];
       if (mark.type === "loop") {
         return {
           id: mark.id || Date.now() + Math.random(),
@@ -52,6 +67,7 @@ function normalizeMarks(marks) {
           position: clampRatio(mark.position, 0),
           end: clampRatio(mark.end, mark.position || 0),
           label: "Loop",
+          color,
         };
       }
 
@@ -61,8 +77,13 @@ function normalizeMarks(marks) {
         position: clampRatio(mark.position, 0),
         time: Math.max(0, Number(mark.time) || 0),
         label: "Mark",
+        color,
       };
     });
+}
+
+function getNextMarkColor(existingMarks) {
+  return MARK_COLORS[existingMarks.length % MARK_COLORS.length];
 }
 
 function normalizeSettings(settings) {
@@ -119,6 +140,7 @@ export default function App() {
   const [audioBuffer, setAudioBuffer] = useState(null);
   const [fileName, setFileName] = useState("");
   const [selection, setSelection] = useState({ start: 0, end: null });
+  const [selectionColor, setSelectionColor] = useState(null);
   const [marks, setMarks] = useState([]);
   const [sourceSettingsKey, setSourceSettingsKey] = useState("");
   const [zoom, setZoom] = useState(1);
@@ -131,6 +153,7 @@ export default function App() {
       const normalizedSettings = normalizeSettings(settings);
       setMarks(normalizedSettings.marks);
       setSelection(normalizedSettings.selection);
+      setSelectionColor(null);
       setZoom(normalizedSettings.zoom);
       player.setTempo(normalizedSettings.tempo);
       player.setPitchCents(normalizedSettings.pitchCents);
@@ -198,6 +221,7 @@ export default function App() {
         position: player.currentTime / player.duration,
         time: player.currentTime,
         label: "Mark",
+        color: getNextMarkColor(existing),
       })
     );
   }, [isLoaded, player.currentTime, player.duration]);
@@ -228,12 +252,19 @@ export default function App() {
         position: selection.start,
         end: selection.end,
         label: "Loop",
+        color: getNextMarkColor(existing),
       })
     );
   }, [selection]);
 
   const selectLoop = useCallback((loop) => {
     setSelection({ start: loop.position, end: loop.end });
+    setSelectionColor(loop.color);
+  }, []);
+
+  const setManualSelection = useCallback((nextSelection) => {
+    setSelection(nextSelection);
+    setSelectionColor(null);
   }, []);
 
   const selectMark = useCallback(
@@ -364,11 +395,12 @@ export default function App() {
               onJumpToSelectionStart={jumpToSelectionStart}
               onPlayPause={player.playPause}
               onSeek={player.seek}
-              onSetSelection={setSelection}
+              onSetSelection={setManualSelection}
               onToggleCountIn={player.toggleCountIn}
               onYouTubePlayerReady={player.attachYouTubePlayer}
               onZoom={setZoom}
               selection={selection}
+              selectionColor={selectionColor}
               sourceType={player.sourceType}
               youtubeVideoId={player.youtubeVideoId}
               zoom={zoom}

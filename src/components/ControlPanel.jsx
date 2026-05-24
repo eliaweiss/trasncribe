@@ -52,6 +52,7 @@ export default function ControlPanel({ duration, marks, onAddLoop, onAddMark, on
                 <li
                   key={mark.id}
                   className="card"
+                  style={{ "--mark-color": mark.color }}
                   onClick={() => onSelectMark(mark)}
                 >
                   <span className="card-label">
@@ -74,6 +75,7 @@ export default function ControlPanel({ duration, marks, onAddLoop, onAddMark, on
                 <li
                   key={loop.id}
                   className="card"
+                  style={{ "--mark-color": loop.color }}
                   onClick={() => onSelectLoop(loop)}
                 >
                   <span className="card-label">

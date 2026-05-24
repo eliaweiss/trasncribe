@@ -374,9 +374,9 @@ button {
 }
 
 .mark-flag {
-  background: linear-gradient(135deg, #8b5cff, #23d6ff);
+  background: var(--mark-color, #23d6ff);
   border-radius: 2px;
-  box-shadow: 0 0 12px rgba(35, 214, 255, 0.5);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--mark-color, #23d6ff) 55%, transparent);
   height: 14px;
   left: 2px;
   position: absolute;
@@ -385,9 +385,9 @@ button {
 }
 
 .mark-line {
-  background: #23d6ff;
+  background: var(--mark-color, #23d6ff);
   bottom: 0;
-  box-shadow: 0 0 14px rgba(35, 214, 255, 0.55);
+  box-shadow: 0 0 14px color-mix(in srgb, var(--mark-color, #23d6ff) 55%, transparent);
   position: absolute;
   top: 0;
   width: 2px;
@@ -996,8 +996,9 @@ button {
 
 .card {
   align-items: center;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(151, 168, 255, 0.14);
+  background:
+    linear-gradient(90deg, color-mix(in srgb, var(--mark-color, #8b5cff) 16%, transparent), rgba(255, 255, 255, 0.04) 46%);
+  border: 1px solid color-mix(in srgb, var(--mark-color, #8b5cff) 42%, rgba(151, 168, 255, 0.14));
   border-radius: 12px;
   color: #f4f7ff;
   cursor: pointer;
@@ -1009,12 +1010,13 @@ button {
 }
 
 .card:hover {
-  border-color: rgba(151, 117, 255, 0.45);
-  box-shadow: 0 0 14px rgba(124, 92, 255, 0.18);
+  border-color: color-mix(in srgb, var(--mark-color, #8b5cff) 72%, white 8%);
+  box-shadow: 0 0 14px color-mix(in srgb, var(--mark-color, #8b5cff) 28%, transparent);
 }
 
 .card-label {
   align-items: center;
+  color: color-mix(in srgb, var(--mark-color, #f4f7ff) 35%, #f4f7ff);
   display: inline-flex;
   font-variant-numeric: tabular-nums;
   font-weight: 500;

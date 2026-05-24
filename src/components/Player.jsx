@@ -24,6 +24,7 @@ export default function Player(props) {
     onToggleCountIn,
     onZoom,
     selection,
+    selectionColor,
     sourceType,
     youtubeVideoId,
     onYouTubePlayerReady,
@@ -125,6 +126,7 @@ export default function Player(props) {
           position={position}
           positionLabel={currentTimeLabel}
           selection={selection}
+          selectionColor={selectionColor}
           width={width}
         />
       </div>

@@ -8,7 +8,7 @@ const HEIGHT = 170;
 const WAVE_TOP = 20;
 const WAVE_BOTTOM = 28;
 
-export default function Timeline({ audioBuffer, duration, marks, onSeek, onSetSelection, position, positionLabel, selection, width }) {
+export default function Timeline({ audioBuffer, duration, marks, onSeek, onSetSelection, position, positionLabel, selection, selectionColor, width }) {
   const canvasRef = useRef(null);
   const waveHeight = HEIGHT - WAVE_TOP - WAVE_BOTTOM;
 
@@ -42,6 +42,7 @@ export default function Timeline({ audioBuffer, duration, marks, onSeek, onSetSe
         height={HEIGHT - WAVE_BOTTOM}
         onSeek={onSeek}
         selection={selection}
+        selectionColor={selectionColor}
         setSelection={onSetSelection}
         width={width}
       />

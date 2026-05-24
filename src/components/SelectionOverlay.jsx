@@ -3,7 +3,19 @@ import React, { useEffect, useRef, useState } from "react";
 const SELECTION_DRAG_THRESHOLD_PIXELS = 4;
 const SELECTION_HANDLE_HIT_RADIUS_PIXELS = 8;
 
-function drawSelection(canvas, selection) {
+function hexToRgb(hex) {
+  if (!hex || typeof hex !== "string") return null;
+  const value = hex.replace("#", "");
+  if (!/^[0-9a-f]{6}$/i.test(value)) return null;
+  const numberValue = Number.parseInt(value, 16);
+  return {
+    r: (numberValue >> 16) & 255,
+    g: (numberValue >> 8) & 255,
+    b: numberValue & 255,
+  };
+}
+
+function drawSelection(canvas, selection, selectionColor) {
   const context = canvas.getContext("2d");
   const width = canvas.width;
   const height = canvas.height;
@@ -11,14 +23,20 @@ function drawSelection(canvas, selection) {
 
   const startX = selection.start * width;
   const endX = selection.end == null ? null : selection.end * width;
+  const rgb = hexToRgb(selectionColor);
+  const startColor = selectionColor || "#7d5cff";
+  const endColor = selectionColor || "#23d6ff";
+  const fillColor = rgb
+    ? `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.16)`
+    : "rgba(125, 92, 255, 0.16)";
 
-  context.fillStyle = "#7d5cff";
+  context.fillStyle = startColor;
   context.fillRect(startX - 1, 0, 3, height);
 
   if (endX != null) {
-    context.fillStyle = "rgba(125, 92, 255, 0.16)";
+    context.fillStyle = fillColor;
     context.fillRect(startX, 0, endX - startX, height);
-    context.fillStyle = "#23d6ff";
+    context.fillStyle = endColor;
     context.fillRect(endX - 1, 0, 3, height);
   }
 }
@@ -44,7 +62,7 @@ function handleFromEvent(event, canvas, selection) {
   return null;
 }
 
-export default function SelectionOverlay({ height, onSeek, selection, setSelection, width }) {
+export default function SelectionOverlay({ height, onSeek, selection, selectionColor, setSelection, width }) {
   const canvasRef = useRef(null);
   const dragModeRef = useRef(null);
   const dragStartRef = useRef(null);
@@ -54,8 +72,8 @@ export default function SelectionOverlay({ height, onSeek, selection, setSelecti
   const [isDragging, setIsDragging] = useState(false);
 
   useEffect(() => {
-    if (canvasRef.current) drawSelection(canvasRef.current, selection);
-  }, [selection, width]);
+    if (canvasRef.current) drawSelection(canvasRef.current, selection, selectionColor);
+  }, [selection, selectionColor, width]);
 
   const updateSectionEnd = event => {
     if (dragStartRef.current == null) return;
