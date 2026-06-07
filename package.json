@@ -3,7 +3,8 @@
     "build": "vite build",
     "check": "npm run build",
     "dev": "vite --host 127.0.0.1 --port 8001",
-    "extract:audio": "node scripts/extract-audio.mjs"
+    "extract:audio": "node scripts/extract-audio.mjs",
+    "extract:youtube": "node scripts/extract-youtube-audio.mjs"
   },
   "devDependencies": {
     "vite": "^8.0.10"
