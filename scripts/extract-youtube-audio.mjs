@@ -12,12 +12,13 @@ Examples:
 node scripts/extract-youtube-audio.mjs "https://youtu.be/JmwOvFtOv9c"
 node scripts/extract-youtube-audio.mjs "https://www.youtube.com/watch?v=ZeIMPqIrZMc" -f wav
 node scripts/extract-youtube-audio.mjs "https://youtu.be/6T6RaSWQbo8?si=hE1up7_ATx4Vw9Ml" -d '/Users/eliaweiss/Music/esev bar' -n my-song
-node scripts/extract-youtube-audio.mjs "https://youtu.be/6T6RaSWQbo8?si=hE1up7_ATx4Vw9Ml" -d '/Users/eliaweiss/Music/esev bar' 
+node scripts/extract-youtube-audio.mjs "https://youtu.be/crruMnUlGcY?si=uwcNrinpRRmb1_F3" -d '/Users/eliaweiss/Music/Tom Jobim' 
 
 Requires yt-dlp and ffmpeg on PATH:
   brew install yt-dlp ffmpeg
 */
 import { spawnSync } from "child_process";
+import { existsSync, mkdirSync } from "fs";
 import { fileURLToPath } from "url";
 import { dirname, isAbsolute, join, resolve } from "path";
 
@@ -110,6 +111,11 @@ const baseDir = outputDir
   : __dirname;
 const baseName = outputName || "%(title)s";
 const outputTemplate = join(baseDir, `${baseName}.%(ext)s`);
+
+if (!existsSync(baseDir)) {
+  console.log(`📂 Output folder does not exist, creating: ${baseDir}`);
+  mkdirSync(baseDir, { recursive: true });
+}
 
 console.log(`🎵 Extracting audio from YouTube video: ${youtubeUrl}`);
 console.log(`🎚️  Audio format: ${audioFormat}`);
