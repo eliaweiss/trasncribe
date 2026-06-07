@@ -6,7 +6,7 @@ node scripts/extract-youtube-audio.mjs <youtube-url> [options]
 Options:
   -f, --format <format>   Audio format (mp3, wav, m4a, ...). Default: mp3
   -d, --dir <folder>      Output folder. Default: the scripts/ directory
-  -n, --name <name>       Output file name without extension. Default: video id
+  -n, --name <name>       Output file name without extension. Default: video title
 
 Examples:
 node scripts/extract-youtube-audio.mjs "https://youtu.be/JmwOvFtOv9c"
@@ -30,7 +30,7 @@ function printUsage() {
   console.log("Options:");
   console.log("  -f, --format <format>   Audio format (mp3, wav, m4a, ...). Default: mp3");
   console.log("  -d, --dir <folder>      Output folder. Default: the scripts/ directory");
-  console.log("  -n, --name <name>       Output file name without extension. Default: video id");
+  console.log("  -n, --name <name>       Output file name without extension. Default: video title");
   console.log("");
   console.log("Examples:");
   console.log('  node scripts/extract-youtube-audio.mjs "https://youtu.be/JmwOvFtOv9c"');
@@ -103,21 +103,18 @@ if (ffmpegCheck.error) {
   process.exit(1);
 }
 
-const videoIdMatch = youtubeUrl.match(/[?&]v=([^&]+)/) || youtubeUrl.match(/youtu\.be\/([^?&/]+)/);
-const videoId = videoIdMatch ? videoIdMatch[1] : "audio";
-
 const baseDir = outputDir
   ? isAbsolute(outputDir)
     ? outputDir
     : resolve(process.cwd(), outputDir)
   : __dirname;
-const baseName = outputName || videoId;
+const baseName = outputName || "%(title)s";
 const outputTemplate = join(baseDir, `${baseName}.%(ext)s`);
 
 console.log(`🎵 Extracting audio from YouTube video: ${youtubeUrl}`);
 console.log(`🎚️  Audio format: ${audioFormat}`);
 console.log(`📁 Output folder: ${baseDir}`);
-console.log(`📝 Output name: ${baseName}.${audioFormat}`);
+console.log(`📝 Output name: ${outputName || "video title"}.${audioFormat}`);
 console.log(`⏱️  Started at ${new Date().toISOString()}`);
 
 const result = spawnSync(
