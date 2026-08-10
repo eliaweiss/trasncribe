@@ -4,7 +4,7 @@
 node scripts/extract-audio.mjs <input-video> [output-audio]
 
 Examples:
-node scripts/extract-audio.mjs scripts/video.mp4
+node scripts/extract-audio.mjs '/Users/eliaweiss/Music/kahol/the camel jig - live2.mp4'
 node scripts/extract-audio.mjs scripts/video.mp4 scripts/audio.mp3
 node scripts/extract-audio.mjs scripts/video.mp4 scripts/audio.wav
 */
