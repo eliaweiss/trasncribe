@@ -9,7 +9,7 @@ Options:
   -n, --name <name>       Output file name without extension. Default: video title
 
 Examples:
-node scripts/extract-youtube-audio.mjs "https://youtu.be/6Fw4AKLCiig?si=qpsM28qzlnSaJCPe"
+node scripts/extract-youtube-audio.mjs "https://youtu.be/fhNrqc6yvTU?si=KTDZ6B12JMGAMXgF"
 node scripts/extract-youtube-audio.mjs "https://www.youtube.com/watch?v=ZeIMPqIrZMc" -f wav
 node scripts/extract-youtube-audio.mjs "https://youtu.be/6T6RaSWQbo8?si=hE1up7_ATx4Vw9Ml" -d '/Users/eliaweiss/Music/esev bar' -n my-song
 node scripts/extract-youtube-audio.mjs "https://youtu.be/crruMnUlGcY?si=uwcNrinpRRmb1_F3" -d '/Users/eliaweiss/Music/Tom Jobim' 
