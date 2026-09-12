@@ -5,14 +5,18 @@
     "dev": "vite --host 127.0.0.1 --port 8001",
     "extract:audio": "node scripts/extract-audio.mjs",
     "extract:youtube": "node scripts/extract-youtube-audio.mjs",
-    "extract:youtube-stems": "node scripts/extract-youtube-stems.mjs"
+    "extract:youtube-stems": "node scripts/extract-youtube-stems.mjs",
+    "extract:lyrics": "node scripts/extract-lyrics.mjs"
   },
   "devDependencies": {
     "vite": "^8.0.10"
   },
   "dependencies": {
+    "@ai-sdk/google": "^4.0.69",
+    "ai": "^7.0.99",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
-    "soundtouchjs": "^0.3.0"
+    "soundtouchjs": "^0.3.0",
+    "zod": "^4.6.2"
   }
 }
