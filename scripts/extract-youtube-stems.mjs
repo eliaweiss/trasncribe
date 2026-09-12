@@ -9,19 +9,25 @@ Downloads audio with extract-youtube-audio.mjs into:
 Then separates stems with demucs and moves them to:
   /Users/eliaweiss/Music/<song name>/stems
 
+With --lyrics, also runs extract-lyrics.mjs on the vocal stem and writes:
+  /Users/eliaweiss/Music/<song name>/stems/lyrics.txt
+
 Options:
   -n, --name <name>       Song / folder name. Default: video title
   -f, --format <format>   Audio format (mp3, wav, m4a, ...). Default: mp3
   -m, --model <model>     Demucs model. Default: htdemucs_6s
+  -l, --lyrics            Extract lyrics from the vocal stem after demucs
       --music-dir <dir>   Music root folder. Default: /Users/eliaweiss/Music
 
 Examples:
 node scripts/extract-youtube-stems.mjs "https://youtu.be/ieDA7pXU-qE"
 node scripts/extract-youtube-stems.mjs "https://youtu.be/MCJ5eH-efWw" -n "Ditado Popular"
+node scripts/extract-youtube-stems.mjs "https://youtu.be/MCJ5eH-efWw" --lyrics
 
 Requires yt-dlp, ffmpeg, and demucs on PATH:
   brew install yt-dlp ffmpeg python
   pip install -U demucs
+With --lyrics, also needs AI_GATEWAY_API_KEY in .env.
 */
 import { spawnSync } from "child_process";
 import {
@@ -41,6 +47,7 @@ const __dirname = dirname(__filename);
 const DEFAULT_MUSIC_DIR = "/Users/eliaweiss/Music";
 const DEFAULT_MODEL = "htdemucs_6s";
 const EXTRACT_SCRIPT = join(__dirname, "extract-youtube-audio.mjs");
+const LYRICS_SCRIPT = join(__dirname, "extract-lyrics.mjs");
 
 function printUsage() {
   console.log("Usage: node scripts/extract-youtube-stems.mjs <youtube-url> [options]");
@@ -49,11 +56,13 @@ function printUsage() {
   console.log("  -n, --name <name>       Song / folder name. Default: video title");
   console.log("  -f, --format <format>   Audio format (mp3, wav, m4a, ...). Default: mp3");
   console.log("  -m, --model <model>     Demucs model. Default: htdemucs_6s");
+  console.log("  -l, --lyrics            Extract lyrics from the vocal stem after demucs");
   console.log("      --music-dir <dir>   Music root folder. Default: /Users/eliaweiss/Music");
   console.log("");
   console.log("Examples:");
   console.log('  node scripts/extract-youtube-stems.mjs "https://youtu.be/MCJ5eH-efWw"');
   console.log('  node scripts/extract-youtube-stems.mjs "https://youtu.be/MCJ5eH-efWw" -n "Ditado Popular"');
+  console.log('  node scripts/extract-youtube-stems.mjs "https://youtu.be/MCJ5eH-efWw" --lyrics');
 }
 
 function run(command, args, options = {}) {
@@ -137,6 +146,7 @@ let audioFormat = "mp3";
 let songName;
 let model = DEFAULT_MODEL;
 let musicDir = DEFAULT_MUSIC_DIR;
+let extractLyrics = false;
 
 for (let i = 0; i < args.length; i += 1) {
   const arg = args[i];
@@ -158,6 +168,10 @@ for (let i = 0; i < args.length; i += 1) {
     case "-m":
     case "--model":
       model = args[++i];
+      break;
+    case "-l":
+    case "--lyrics":
+      extractLyrics = true;
       break;
     case "--music-dir":
       musicDir = args[++i];
@@ -233,6 +247,7 @@ console.log(`🎵 YouTube: ${youtubeUrl}`);
 console.log(`📁 Song folder: ${songDir}`);
 console.log(`🎚️  Audio: ${audioPath}`);
 console.log(`🎛️  Demucs model: ${model}`);
+console.log(`📝 Extract lyrics: ${extractLyrics ? "yes" : "no"}`);
 console.log(`⏱️  Started at ${new Date().toISOString()}`);
 
 if (!existsSync(songDir)) {
@@ -292,6 +307,28 @@ console.log(`\n📦 Moving stems to: ${stemsDir}`);
 moveStems(demucsOutDir, stemsDir);
 rmSync(demucsOutDir, { recursive: true, force: true });
 
+if (extractLyrics) {
+  console.log("\n—— Extracting lyrics ——");
+  const lyricsResult = run(
+    process.execPath,
+    [LYRICS_SCRIPT, stemsDir],
+    { stdio: "inherit" },
+  );
+
+  if (lyricsResult.error) {
+    console.error("\n❌ Failed to run extract-lyrics.mjs:", lyricsResult.error.message);
+    process.exit(1);
+  }
+
+  if (lyricsResult.status !== 0) {
+    console.error(`\n❌ extract-lyrics.mjs exited with code ${lyricsResult.status}`);
+    process.exit(lyricsResult.status || 1);
+  }
+}
+
 console.log(`\n✅ Done`);
 console.log(`🎵 Audio: ${audioPath}`);
 console.log(`🎛️  Stems: ${stemsDir}`);
+if (extractLyrics) {
+  console.log(`📝 Lyrics: ${join(stemsDir, "lyrics.txt")}`);
+}
