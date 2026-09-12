@@ -4,7 +4,8 @@
     "check": "npm run build",
     "dev": "vite --host 127.0.0.1 --port 8001",
     "extract:audio": "node scripts/extract-audio.mjs",
-    "extract:youtube": "node scripts/extract-youtube-audio.mjs"
+    "extract:youtube": "node scripts/extract-youtube-audio.mjs",
+    "extract:youtube-stems": "node scripts/extract-youtube-stems.mjs"
   },
   "devDependencies": {
     "vite": "^8.0.10"
